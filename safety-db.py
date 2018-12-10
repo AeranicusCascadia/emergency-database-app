@@ -35,7 +35,7 @@ def create_staff_table():
 		
 		
 
-def insert_test_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
+def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 # insert dest data into staff table
 
 	# insert info into staff table
@@ -48,8 +48,34 @@ def insert_test_data(last_name, first_name, floor, warden_zone, mob_ass, med_nee
 	# Message to user
 	print('Data inserted into staff table.')
 	
-def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
-	pass
+def update_test_data():
+
+	statement = '''
+	UPDATE staff
+	SET mobility_assistance = 'yes'
+	WHERE last_name = 'Gomez' AND first_name = 'Sal'
+	'''
+	
+	cursor.execute(statement)
+	db.commit()
+	
+def update_floor(l_name, f_name, new_data):
+	statement = f'''
+	UPDATE staff
+	SET floor = {new_data}
+	WHERE last_name = {l_name} AND first_name = {f_name}
+	'''
+	
+	cursor.execute(statement)
+	db.commit()
+	
+def update_medical_needs(l_name, f_name, new_data):
+	
+	cursor.execute('''UPDATE staff SET medical_needs = ? WHERE last_name = ? AND first_name = ?''',(new_data, l_name, f_name,))
+	
+	
+	
+	db.commit()
 	
 def poplulate_db_from_phonelist():
 	pass
@@ -70,18 +96,25 @@ def display_all_rows():
 	# iterate through every row
 	for row in all_rows:
 		# print data in every column
-		print(f'{row[0]})  {row[1]}, {row[2]}. floor: {row[3]}. warden zone: {row[4]}. assistance? {row[5]}. meds? {row[6]}')
+		print(f'{row[0]})  {row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
 
-	
-	
-
-
+		
+		
 create_staff_table()
 
-insert_test_data("Doe", "Jane", 1, 1, "no", "no")
-insert_test_data("Spade", "Sam", 3, 5, "yes", "insulin")
-insert_test_data("Gomez", "Sal", 2, 3, "no", "no")
-insert_test_data("Washington", "Kaylee", 2, 3, "yes", "wheelchair")
+"""
+# Will insert every time script is run (temporarily)
+insert_data("Doe", "Jane", 1, 1, "no", "no")
+insert_data("Spade", "Sam", 3, 5, "yes", "insulin")
+insert_data("Gomez", "Sal", 2, 3, "no", "no")
+insert_data("Washington", "Kaylee", 2, 3, "yes", "wheelchair")
+"""
+
+display_all_rows()
+
+#update_test_data()
+#update_floor('Doe', 'Jane', 3)
+update_medical_needs('Gomez', 'Sal', 'crutches')
 
 display_all_rows()
 
