@@ -116,10 +116,6 @@ def update_medical_needs(l_name, f_name, new_data):
 		# Returns arguments
 		message = F'{l_name}, {f_name} - medical needs updated to: {new_data}'
 		return message
-		
-	
-def poplulate_db_from_phonelist():
-	pass
 	
 def display_all_rows():
 	
@@ -139,10 +135,46 @@ def display_all_rows():
 		# print data in every column
 		print(f'{row[0]})  {row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
 
-		
-		
-create_staff_table()
+def display_all_sorted_rows():
 
+	# execute select query
+	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff\
+	ORDER BY last_name''')
+	
+	# pass fetchall (rows) method to var: all_rows
+	all_rows = cursor.fetchall()
+	
+	# Just a little formatting, etc
+	print('')
+	print('Emergency information for staff:')
+	print('-------------------------------')
+	
+	# iterate through every row
+	for row in all_rows:
+		# print data in every column
+		print(f'{row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
+
+def create_sorted_document():
+
+	# execute select query
+	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff\
+	ORDER BY last_name''')
+	
+	# pass fetchall (rows) method to var: all_rows
+	all_rows = cursor.fetchall()
+	
+	with open("sorted_list.txt", "w+") as file:
+		# iterate through every row
+		for row in all_rows:
+			file.write(f'{row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
+			file.write("\n")
+			
+	file.close()
+	
+def delete_by_id(staff_id):
+	pass
+		
+# create_staff_table()
 
 # Will insert every time script is run 
 """
@@ -155,11 +187,11 @@ insert_data("Jennings", "Robert", 1, 2, "yes", "cast (arm)")
 insert_data("Goldsmith", "Chloe", 2, 4, "no", "no")
 """
 
-display_all_rows()
-
-print(update_mobility_assistance('Goldsmith', 'Chloe', 'maybe'))
 
 display_all_rows()
+
+
+
 db.close()
 
 
