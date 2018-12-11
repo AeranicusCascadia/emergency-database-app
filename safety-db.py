@@ -31,9 +31,7 @@ def create_staff_table():
 		
 	except:
 		# message if table exists
-		print('staff table already exists.')
-		
-		
+		print('staff table already exists.')	
 
 def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 # insert dest data into staff table
@@ -60,22 +58,65 @@ def update_test_data():
 	db.commit()
 	
 def update_floor(l_name, f_name, new_data):
-	statement = f'''
-	UPDATE staff
-	SET floor = {new_data}
-	WHERE last_name = {l_name} AND first_name = {f_name}
-	'''
 	
-	cursor.execute(statement)
+	# Execute SQL
+	cursor.execute('''UPDATE staff SET floor = ? WHERE last_name = ? AND first_name = ?'''\
+	,(new_data, l_name, f_name,))
+	
+	# Commit changes to database
 	db.commit()
+	
+	print('')
+	
+	# Returns arguments
+	message = F'{l_name}, {f_name} - floor number updated to: {new_data}'
+	return message
+	
+def update_warden_zone(l_name, f_name, new_data):
+	
+	# Execute SQL
+	cursor.execute('''UPDATE staff SET mobility_assistance = ? WHERE last_name = ? AND first_name = ?'''\
+	,(new_data, l_name, f_name,))
+	
+	# Commit changes to database
+	db.commit()
+	
+	print('')
+	
+	# Returns arguments
+	message = F'{l_name}, {f_name} - warden zone updated to: {new_data}'
+	return message
+	
+def update_mobility_assistance(l_name, f_name, new_data):
+
+		# Execute SQL
+		cursor.execute('''UPDATE staff SET medical_needs = ? WHERE last_name = ? AND first_name = ?'''\
+		,(new_data, l_name, f_name,))
+		
+		# Commit changes to database
+		db.commit()
+		
+		print('')
+		
+		# Returns arguments
+		message = F'{l_name}, {f_name} - mobility assistance updated to: {new_data}'
+		return message
 	
 def update_medical_needs(l_name, f_name, new_data):
 	
-	cursor.execute('''UPDATE staff SET medical_needs = ? WHERE last_name = ? AND first_name = ?''',(new_data, l_name, f_name,))
-	
-	
-	
-	db.commit()
+		# Execute SQL
+		cursor.execute('''UPDATE staff SET medical_needs = ? WHERE last_name = ? AND first_name = ?'''\
+		,(new_data, l_name, f_name,))
+		
+		# Commit changes to database
+		db.commit()
+		
+		print('')
+		
+		# Returns arguments
+		message = F'{l_name}, {f_name} - medical needs updated to: {new_data}'
+		return message
+		
 	
 def poplulate_db_from_phonelist():
 	pass
@@ -102,22 +143,24 @@ def display_all_rows():
 		
 create_staff_table()
 
+
+# Will insert every time script is run 
 """
-# Will insert every time script is run (temporarily)
 insert_data("Doe", "Jane", 1, 1, "no", "no")
 insert_data("Spade", "Sam", 3, 5, "yes", "insulin")
 insert_data("Gomez", "Sal", 2, 3, "no", "no")
 insert_data("Washington", "Kaylee", 2, 3, "yes", "wheelchair")
+insert_data("Chang", "Sarah", 3, 6, "no", "no")
+insert_data("Jennings", "Robert", 1, 2, "yes", "cast (arm)")
+insert_data("Goldsmith", "Chloe", 2, 4, "no", "no")
 """
 
 display_all_rows()
 
-#update_test_data()
-#update_floor('Doe', 'Jane', 3)
-update_medical_needs('Gomez', 'Sal', 'crutches')
+print(update_mobility_assistance('Goldsmith', 'Chloe', 'maybe'))
 
 display_all_rows()
-
+db.close()
 
 
 
