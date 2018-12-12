@@ -3,6 +3,7 @@
 import sqlite3
 from tkinter import *
 from tkinter import scrolledtext
+from tkinter import Menu
 
 # create database
 db = sqlite3.connect('database')
@@ -18,13 +19,42 @@ warden_zone = 0
 mob_ass = "no"
 med_needs = "no"
 
+# File --> Exit
+def client_exit():
+	exit()
+
+
 # Tkinter widgets
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
 window.geometry('800x600')
 
-text_1 = scrolledtext.ScrolledText(window,width=90,height=10)
+# create menu object
+menu = Menu(window)
+
+
+new_item_1 = Menu(menu)
+
+# label button and wire function to it
+new_item_1.add_command(label='Exit', command=client_exit)
+
+# pin exit_button to File menu on file bar
+menu.add_cascade(label='File', menu=new_item_1)
+
+new_item_2 = Menu(menu)
+new_item_2.add_command(label='Button 2')
+new_item_2.add_separator()
+new_item_2.add_command(label='Button 3')
+menu.add_cascade(label='More Buttons', menu=new_item_2)
+
+
+# main text area (scrollable)
+text_1 = scrolledtext.ScrolledText(window,width=95,height=25)
 text_1.grid(column=0,row=0)
+
+# pin the menu widget to the window object
+window.config(menu=menu)
+
 
 
 def close_database():
@@ -139,43 +169,6 @@ def update_medical_needs(l_name, f_name, new_data):
 		message = F'{l_name}, {f_name} - medical needs updated to: {new_data}'
 		return message
 	
-def display_all_rows():
-	
-	# execute select query
-	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
-	
-	# pass fetchall (rows) method to var: all_rows
-	all_rows = cursor.fetchall()
-	
-	# Just a little formatting, etc
-	print('')
-	print('Emergency information for staff:')
-	print('-------------------------------')
-	
-	# iterate through every row
-	for row in all_rows:
-		# print data in every column
-		print(f'{row[0]})  {row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
-
-def display_all_sorted_rows():
-
-	# execute select query
-	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff\
-	ORDER BY last_name''')
-	
-	# pass fetchall (rows) method to var: all_rows
-	all_rows = cursor.fetchall()
-	
-	# Just a little formatting, etc
-	print('')
-	print('Emergency information for staff:')
-	print('-------------------------------')
-	
-	# iterate through every row
-	for row in all_rows:
-		# print data in every column
-		print(f'{row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
-
 def create_sorted_document():
 
 	# execute select query
@@ -196,36 +189,44 @@ def create_sorted_document():
 def delete_by_id(staff_id):
 	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
 		
-def test_text_1():
+def display_records(mode):
 	
-	#execute select query
-	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
-	
+	if (mode == 'numeric'):
+		#execute select query, default sort by primary key
+		cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
+	elif (mode == 'alphabetic'):
+		# execute select query, sort alphabetically by last name
+		cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff\
+		ORDER BY last_name''')
+		
 	# pass fetchall (rows) method to var: all_rows
 	all_rows = cursor.fetchall()
 	
 	# iterate through every row
 	for row in all_rows:
 		
-		content = f'{row[0]})  {row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}'
-		text_1.insert(INSERT, content + '\n')
-		
+		if (mode == 'numeric'):
+			# display with staff_id leading
+			content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+			text_1.insert(INSERT, content + '\n')
+			
+		elif (mode == 'alphabetic'):
+			# Don't display staff_id
+			content = f'{row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+			text_1.insert(INSERT, content + '\n')
+	
 	text_1.config(state = 'disabled')
 		
 		
 # create_staff_table()
+# insert_test_data()
 
-insert_test_data()
+# display_records('alphabetic')
 
-# display_all_rows()
 # create_sorted_document()
 
-# test_text_1()
-test_text_1()
-
-# run main loop
+# run main loop - last function before closing db
 window.mainloop()
-
 
 db.close()
 
