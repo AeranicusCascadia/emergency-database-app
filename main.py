@@ -4,6 +4,7 @@ import sqlite3
 from tkinter import *
 from tkinter import scrolledtext
 from tkinter import Menu
+from tkinter import messagebox
 
 # create database
 db = sqlite3.connect('database')
@@ -23,23 +24,19 @@ med_needs = "no"
 def client_exit():
 	exit()
 
-# Tkinter widgets
+# create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
 window.geometry('800x600')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
-new_item_1 = Menu(menu, tearoff=0) # add first menu category
-new_item_1.add_command(label='Exit', command=client_exit) # add first button to menu category
-menu.add_cascade(label='File', menu=new_item_1) # add top level (File) to first menu category
-
 window.config(menu=menu) # attach the menu to root window
-	
+
+# text area created early so functions defined below can target it
 text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 text_1.grid(column=0,row=0) # place scroll text box by grid coordinate
 	
-# functions below target scroll text box (text_1):
 
 def display_numeric():
 	
@@ -56,7 +53,7 @@ def display_numeric():
 	
 	for row in all_rows:
 		# display with staff_id leading
-		content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		content = f' {row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
 		
 		text_1.insert(INSERT, content + '\n')
 		
@@ -80,7 +77,7 @@ def display_alphabetic():
 	
 	for row in all_rows:
 		# display with staff_id leading
-		content = f'{row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		content = f' {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
 		
 		text_1.insert(INSERT, content + '\n')
 		
@@ -88,11 +85,7 @@ def display_alphabetic():
 	text_1.config(state = 'disabled')
 
 # These menu widgets call functions above
-new_item_2 = Menu(menu, tearoff=0)
-new_item_2.add_command(label='display by entry number', command=display_numeric)
-new_item_2.add_separator()
-new_item_2.add_command(label='display by last name', command=display_alphabetic)
-menu.add_cascade(label='Display Records', menu=new_item_2)
+
 
 def close_database():
 	db.close
@@ -215,17 +208,37 @@ def create_sorted_document():
 	# pass fetchall (rows) method to var: all_rows
 	all_rows = cursor.fetchall()
 	
-	with open("sorted_list.txt", "w+") as file:
+	with open("sorted_list.txt", "w+") as file: # create/overwrite text file
 		# iterate through every row
 		for row in all_rows:
-			file.write(f'{row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
+			file.write(f' {row[1]}, {row[2]}. Floor: {row[3]}. Warden Zone: {row[4]}. Assistance? {row[5]}. Meds? {row[6]}')
 			file.write("\n")
 			
 	file.close()
 	
+	messagebox.showinfo("File Operation", "'sorted_list.txt' created or updated.")
+	
+new_item_1 = Menu(menu, tearoff=0) # add first menu category
+new_item_1.add_command(label='Create Staff List (text file)', command=create_sorted_document)	
+new_item_1.add_command(label='Exit', command=client_exit) # add first button to menu category
+
+menu.add_cascade(label='File', menu=new_item_1) # add top level (File) to first menu category
+
+new_item_2 = Menu(menu, tearoff=0)
+new_item_2.add_command(label='Display by Entry Number', command=display_numeric)
+new_item_2.add_separator()
+new_item_2.add_command(label='Display by Last Name', command=display_alphabetic)
+
+menu.add_cascade(label='Display Records', menu=new_item_2) # add second menu category
+
+
+
+
+
+"""	
 def delete_by_id(staff_id):
 	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
-"""		
+	
 def display_records(mode, target):
 	
 	if (mode == 'numeric'):
@@ -258,9 +271,7 @@ def display_records(mode, target):
 # create_staff_table()
 # insert_test_data()
 
-# display_records('numeric', text_1)
 
-#create_sorted_document()
 
 # run main loop - last function before closing db
 window.mainloop()
