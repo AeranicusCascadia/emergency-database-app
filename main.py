@@ -39,9 +39,14 @@ window.config(menu=menu) # attach the menu to root window
 text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 text_1.grid(column=0,row=0) # place scroll text box by grid coordinate
 	
-# targets scroll text box (text_1)
-def display_numeric():
+# functions below target scroll text box (text_1):
 
+def display_numeric():
+	
+	# enable text field and clear it
+	text_1.config(state = 'normal')
+	text_1.delete(1.0, END)
+	
 	#execute select query, default sort by primary key
 	cursor.execute('''SELECT staff_id, last_name, first_name, \
 	floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
@@ -51,19 +56,42 @@ def display_numeric():
 	
 	for row in all_rows:
 		# display with staff_id leading
-		content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: \
-		{row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
 		
 		text_1.insert(INSERT, content + '\n')
 		
+	# disable text field to be read-only
 	text_1.config(state = 'disabled')
 	
+	
+def display_alphabetic():
+	
+	# enable text field and clear it
+	text_1.config(state = 'normal')
+	text_1.delete(1.0, END)
+
+	#execute select query, default sort by primary key
+	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, \
+	mobility_assistance, medical_needs FROM staff\
+	ORDER BY last_name''')
+	
+	# pass fetchall (rows) method to var: all_rows
+	all_rows = cursor.fetchall()
+	
+	for row in all_rows:
+		# display with staff_id leading
+		content = f'{row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		
+		text_1.insert(INSERT, content + '\n')
+		
+	# disable text field to be read-only
+	text_1.config(state = 'disabled')
 
 # These menu widgets call functions above
 new_item_2 = Menu(menu, tearoff=0)
 new_item_2.add_command(label='display by entry number', command=display_numeric)
 new_item_2.add_separator()
-new_item_2.add_command(label='display by last name')
+new_item_2.add_command(label='display by last name', command=display_alphabetic)
 menu.add_cascade(label='Display Records', menu=new_item_2)
 
 def close_database():
