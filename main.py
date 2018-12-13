@@ -35,9 +35,16 @@ window.config(menu=menu) # attach the menu to root window
 
 # text area created early so functions defined below can target it
 text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
-text_1.grid(column=0,row=0) # place scroll text box by grid coordinate
+text_1.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll text box by grid coordinate
 	
+label_2 = Label(window, text='Input Area -->')
+label_2.grid(column=0,row=1)
 
+# create input area
+entry_1 = Entry(window, width=87)
+entry_1.grid(row=1, column=1, columnspan=4)
+	
+	
 def display_numeric():
 	
 	# enable text field and clear it
