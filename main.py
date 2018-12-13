@@ -23,39 +23,48 @@ med_needs = "no"
 def client_exit():
 	exit()
 
-
 # Tkinter widgets
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
 window.geometry('800x600')
 
-# create menu object
-menu = Menu(window)
+menu = Menu(window) # add menu (automatically goes on top bar in root window
 
+new_item_1 = Menu(menu, tearoff=0) # add first menu category
+new_item_1.add_command(label='Exit', command=client_exit) # add first button to menu category
+menu.add_cascade(label='File', menu=new_item_1) # add top level (File) to first menu category
 
-new_item_1 = Menu(menu)
+window.config(menu=menu) # attach the menu to root window
+	
+text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
+text_1.grid(column=0,row=0) # place scroll text box by grid coordinate
+	
+# targets scroll text box (text_1)
+def display_numeric():
 
-# label button and wire function to it
-new_item_1.add_command(label='Exit', command=client_exit)
+	#execute select query, default sort by primary key
+	cursor.execute('''SELECT staff_id, last_name, first_name, \
+	floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
+	
+	# pass fetchall (rows) method to var: all_rows
+	all_rows = cursor.fetchall()
+	
+	for row in all_rows:
+		# display with staff_id leading
+		content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: \
+		{row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		
+		text_1.insert(INSERT, content + '\n')
+		
+	text_1.config(state = 'disabled')
+	
 
-# pin exit_button to File menu on file bar
-menu.add_cascade(label='File', menu=new_item_1)
-
-new_item_2 = Menu(menu)
-new_item_2.add_command(label='Button 2')
+# These menu widgets call functions above
+new_item_2 = Menu(menu, tearoff=0)
+new_item_2.add_command(label='display by entry number', command=display_numeric)
 new_item_2.add_separator()
-new_item_2.add_command(label='Button 3')
-menu.add_cascade(label='More Buttons', menu=new_item_2)
-
-
-# main text area (scrollable)
-text_1 = scrolledtext.ScrolledText(window,width=95,height=25)
-text_1.grid(column=0,row=0)
-
-# pin the menu widget to the window object
-window.config(menu=menu)
-
-
+new_item_2.add_command(label='display by last name')
+menu.add_cascade(label='Display Records', menu=new_item_2)
 
 def close_database():
 	db.close
@@ -188,8 +197,8 @@ def create_sorted_document():
 	
 def delete_by_id(staff_id):
 	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
-		
-def display_records(mode):
+"""		
+def display_records(mode, target):
 	
 	if (mode == 'numeric'):
 		#execute select query, default sort by primary key
@@ -208,28 +217,24 @@ def display_records(mode):
 		if (mode == 'numeric'):
 			# display with staff_id leading
 			content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
-			text_1.insert(INSERT, content + '\n')
+			target.insert(INSERT, content + '\n')
 			
 		elif (mode == 'alphabetic'):
 			# Don't display staff_id
 			content = f'{row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
-			text_1.insert(INSERT, content + '\n')
+			target.insert(INSERT, content + '\n')
 	
-	text_1.config(state = 'disabled')
-		
+	target.config(state = 'disabled')
+"""		
 		
 # create_staff_table()
 # insert_test_data()
 
-# display_records('alphabetic')
+# display_records('numeric', text_1)
 
-# create_sorted_document()
+#create_sorted_document()
 
 # run main loop - last function before closing db
 window.mainloop()
 
 db.close()
-
-
-
-
