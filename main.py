@@ -36,13 +36,23 @@ window.config(menu=menu) # attach the menu to root window
 # text area created early so functions defined below can target it
 text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 text_1.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll text box by grid coordinate
+
+# create field for application messages to user
+text_2 = Text(window, width=75, height=2)
+text_2.grid(row=1, column=1, columnspan=3, pady=7)
+text_2.config(state = 'disabled') # field initially disabled
 	
-label_2 = Label(window, text='Input Area -->')
-label_2.grid(column=0,row=1)
+# create and place label for application messages field
+label_1 = Label(window, text='Application Messages -->', bg="blue", fg="white")
+label_1.grid(column=0,row=1)
+	
+# create and place label for user input field
+label_2 = Label(window, text='User Input Area -->', bg="green", fg="white")
+label_2.grid(column=0,row=2)
 
 # create input area
-entry_1 = Entry(window, width=87)
-entry_1.grid(row=1, column=1, columnspan=4)
+entry_1 = Entry(window, width=95)
+entry_1.grid(row=2, column=1, columnspan=3, pady=7)
 	
 	
 def display_numeric():
@@ -93,9 +103,6 @@ def display_alphabetic():
 
 # These menu widgets call functions above
 
-
-def close_database():
-	db.close
 
 def create_staff_table():
 	# try to create staff table
@@ -225,55 +232,40 @@ def create_sorted_document():
 	
 	messagebox.showinfo("File Operation", "'sorted_list.txt' created or updated.")
 	
+def delete_by_id(staff_id):
+	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
+	
+def menu_create_entry():
+	display_numeric()
+	
+# new_item_x represents cascading sub-menu
 new_item_1 = Menu(menu, tearoff=0) # add first menu category
+# add and config menu items for File
 new_item_1.add_command(label='Create Staff List (text file)', command=create_sorted_document)	
-new_item_1.add_command(label='Exit', command=client_exit) # add first button to menu category
+new_item_1.add_command(label='Exit', command=client_exit) 
 
 menu.add_cascade(label='File', menu=new_item_1) # add top level (File) to first menu category
 
-new_item_2 = Menu(menu, tearoff=0)
+# create and configure menu items for Display Records
+new_item_2 = Menu(menu, tearoff=0) # add second menu category
 new_item_2.add_command(label='Display by Entry Number', command=display_numeric)
 new_item_2.add_separator()
 new_item_2.add_command(label='Display by Last Name', command=display_alphabetic)
 
-menu.add_cascade(label='Display Records', menu=new_item_2) # add second menu category
+menu.add_cascade(label='Display Records', menu=new_item_2) # add top level (Display Records) to first menu category
 
+# and so on...
+new_item_3 = Menu(menu, tearoff=0)
+new_item_3.add_command(label='Create New Record', command=menu_create_entry)
+new_item_3.add_separator()
+new_item_3.add_command(label='Modify Record')
+new_item_3.add_separator()
+new_item_3.add_command(label='Delete Record')
 
+menu.add_cascade(label='Edit Database', menu=new_item_3)
 
-
-
-"""	
-def delete_by_id(staff_id):
-	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
 	
-def display_records(mode, target):
-	
-	if (mode == 'numeric'):
-		#execute select query, default sort by primary key
-		cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff''')
-	elif (mode == 'alphabetic'):
-		# execute select query, sort alphabetically by last name
-		cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff\
-		ORDER BY last_name''')
-		
-	# pass fetchall (rows) method to var: all_rows
-	all_rows = cursor.fetchall()
-	
-	# iterate through every row
-	for row in all_rows:
-		
-		if (mode == 'numeric'):
-			# display with staff_id leading
-			content = f'{row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
-			target.insert(INSERT, content + '\n')
-			
-		elif (mode == 'alphabetic'):
-			# Don't display staff_id
-			content = f'{row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
-			target.insert(INSERT, content + '\n')
-	
-	target.config(state = 'disabled')
-"""		
+
 		
 # create_staff_table()
 # insert_test_data()
