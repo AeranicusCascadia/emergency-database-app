@@ -237,12 +237,13 @@ def delete_by_id(staff_id):
 	
 def fetch_data_confim():
 
-	"""
-	the_data = text_2.get("1.0", END)
+	
+	the_data = entry_1.get()
 	text_2.config(state = 'normal')
-	text_2.delete(1.0, END)
-	text_2.insert(0.0, the_data)
-	"""
+	text_2.delete('1.0', END)
+	text_2.insert('1.0', the_data)
+	entry_1.delete('0', END) # entry widget uses different index reference than text widget!
+	
 	
 	# just print to console for testing.
 	print('Button clicked')
