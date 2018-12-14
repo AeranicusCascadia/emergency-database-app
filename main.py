@@ -38,21 +38,21 @@ text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll te
 text_1.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll text box by grid coordinate
 
 # create field for application messages to user
-text_2 = Text(window, width=75, height=2)
-text_2.grid(row=1, column=1, columnspan=3, pady=7)
+text_2 = Text(window, width=75, height=5)
+text_2.grid(row=1, column=1, columnspan=3, pady=10)
 text_2.config(state = 'disabled') # field initially disabled
 	
 # create and place label for application messages field
-label_1 = Label(window, text='Application Messages -->', bg="blue", fg="white")
+label_1 = Label(window, text='Application Messages -->', bg="white", fg="blue", font=("Arial Bold", 9))
 label_1.grid(column=0,row=1)
 	
 # create and place label for user input field
-label_2 = Label(window, text='User Input Area -->', bg="green", fg="white")
+label_2 = Label(window, text='User Input Area -->', bg="white", fg="blue", font=("Arial Bold", 9))
 label_2.grid(column=0,row=2)
 
 # create input area
-entry_1 = Entry(window, width=95)
-entry_1.grid(row=2, column=1, columnspan=3, pady=7)
+entry_1 = Entry(window, width=85)
+entry_1.grid(row=2, column=1, columnspan=2, pady=15)
 	
 	
 def display_numeric():
@@ -235,8 +235,25 @@ def create_sorted_document():
 def delete_by_id(staff_id):
 	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
 	
+def fetch_data_confim():
+
+	"""
+	the_data = text_2.get("1.0", END)
+	text_2.config(state = 'normal')
+	text_2.delete(1.0, END)
+	text_2.insert(0.0, the_data)
+	"""
+	
+	# just print to console for testing.
+	print('Button clicked')
+	
 def menu_create_entry():
 	display_numeric()
+	text_2.config(state = 'normal')
+	text_2.insert(0.0, "Creating new a record.\n\nPlease enter the last name of the staff member below and confirm.")
+	
+	
+	
 	
 # new_item_x represents cascading sub-menu
 new_item_1 = Menu(menu, tearoff=0) # add first menu category
@@ -264,6 +281,9 @@ new_item_3.add_command(label='Delete Record')
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
+# add 'confirm' button related to entry_1
+confirm_button = Button(window, text="Confirm", bg="green", fg="white", command=fetch_data_confim)
+confirm_button.grid(row=2, column=3, padx=10)
 	
 
 		
