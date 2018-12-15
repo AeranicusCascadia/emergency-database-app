@@ -20,6 +20,8 @@ warden_zone = 0
 mob_ass = "no"
 med_needs = "no"
 
+displayed_message = "starting message content"
+
 # File --> Exit
 def client_exit():
 	exit()
@@ -36,6 +38,7 @@ window.config(menu=menu) # attach the menu to root window
 # text area created early so functions defined below can target it
 text_1 = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 text_1.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll text box by grid coordinate
+text_1.config(state = 'disabled') # start disabled. enable through appropriate functions
 
 # create field for application messages to user
 text_2 = Text(window, width=75, height=5)
@@ -77,6 +80,9 @@ def display_numeric():
 	# disable text field to be read-only
 	text_1.config(state = 'disabled')
 	
+	# Print to console for testing
+	print('display_numeric')
+	
 	
 def display_alphabetic():
 	
@@ -101,8 +107,8 @@ def display_alphabetic():
 	# disable text field to be read-only
 	text_1.config(state = 'disabled')
 
-# These menu widgets call functions above
-
+	# Print to console for testing
+	print('display_alphabetic')
 
 def create_staff_table():
 	# try to create staff table
@@ -113,11 +119,11 @@ def create_staff_table():
 			warden_zone INTEGER, mobility_assistance TEXT, medical_needs TEXT)
 		''')
 		
-		print('Creating staff table in database.')
+		print('create_staff_table --> created table')
 		
 	except:
 		# message if table exists
-		print('Tried to create staff table, but it already exists.')	
+		print('create_staff_table --> attempted to create staff table, but it already exists.')	
 
 def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 # insert dest data into staff table
@@ -129,8 +135,8 @@ def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 	# commit to database
 	db.commit()
 	
-	# Message to user
-	print('Data inserted into staff table.')
+	# Print to console for testing
+	print('insert_data')
 	
 def insert_test_data():
 	insert_data("Doe", "Jane", 1, 1, "no", "no")
@@ -142,16 +148,8 @@ def insert_test_data():
 	insert_data("Goldsmith", "Chloe", 2, 4, "no", "no")
 	insert_data("Brown", "Marvin", 2, 5, "no", "no")
 	
-def update_test_data():
-
-	statement = '''
-	UPDATE staff
-	SET mobility_assistance = 'yes'
-	WHERE last_name = 'Gomez' AND first_name = 'Sal'
-	'''
-	
-	cursor.execute(statement)
-	db.commit()
+	# Print to console for testing.
+	print('insert_test_data')
 	
 def update_floor(l_name, f_name, new_data):
 	
@@ -162,7 +160,8 @@ def update_floor(l_name, f_name, new_data):
 	# Commit changes to database
 	db.commit()
 	
-	print('')
+	# Print to console for testing.
+	print('update_floor')
 	
 	# Returns arguments
 	message = F'{l_name}, {f_name} - floor number updated to: {new_data}'
@@ -177,7 +176,8 @@ def update_warden_zone(l_name, f_name, new_data):
 	# Commit changes to database
 	db.commit()
 	
-	print('')
+	# Print to console for testing.
+	print('update_warden_zone')
 	
 	# Returns arguments
 	message = F'{l_name}, {f_name} - warden zone updated to: {new_data}'
@@ -192,7 +192,8 @@ def update_mobility_assistance(l_name, f_name, new_data):
 		# Commit changes to database
 		db.commit()
 		
-		print('')
+		# Print to console for testing.
+		print('update_mobility_assistance')
 		
 		# Returns arguments
 		message = F'{l_name}, {f_name} - mobility assistance updated to: {new_data}'
@@ -207,7 +208,8 @@ def update_medical_needs(l_name, f_name, new_data):
 		# Commit changes to database
 		db.commit()
 		
-		print('')
+		# Print to console for testing.
+		print('update_medical_needs')
 		
 		# Returns arguments
 		message = F'{l_name}, {f_name} - medical needs updated to: {new_data}'
@@ -232,27 +234,35 @@ def create_sorted_document():
 	
 	messagebox.showinfo("File Operation", "'sorted_list.txt' created or updated.")
 	
+	# Print to console for testing.
+	print('create_sorted_document')
+	
 def delete_by_id(staff_id):
 	cursor.execute('''DELETE FROM staff WHERE staff_id = ? ''', (staff_id,))
 	
-def fetch_data_confim():
-
+	# Print to console for testing.
+	print('delete_by_id')
 	
-	the_data = entry_1.get()
-	text_2.config(state = 'normal')
+def fetch_data_confim():
+	
+	
+	displayed_message = entry_1.get()
 	text_2.delete('1.0', END)
-	text_2.insert('1.0', the_data)
+	text_2.insert('1.0', displayed_message)
 	entry_1.delete('0', END) # entry widget uses different index reference than text widget!
 	
+	#text_2.config(state = 'disabled') # disables application message area to prevent sending unwanted random input
 	
-	# just print to console for testing.
-	print('Button clicked')
+	# Print to console for testing.
+	print('fetch_data_confim')
 	
 def menu_create_entry():
 	display_numeric()
-	text_2.config(state = 'normal')
+	text_2.config(state = 'normal') # enables outputting to Application Message area
 	text_2.insert(0.0, "Creating new a record.\n\nPlease enter the last name of the staff member below and confirm.")
 	
+	# Print to console for testing.
+	print('menu_create_entry')
 	
 	
 	
