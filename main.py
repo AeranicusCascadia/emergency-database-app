@@ -36,7 +36,7 @@ def client_exit():
 # create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
-window.geometry('800x600')
+window.geometry('800x700')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
@@ -50,18 +50,26 @@ main_display.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
 
 # ROW 1:
-
-# create field for application messages to user
-message_display = Text(window, width=85, height=5)
-message_display.grid(row=1, column=1, columnspan=3, padx=5, pady=10)
-message_display.config(state = 'disabled') # field initially disabled
-	
 # create and place label for application messages field
-message_display_label = Label(window, text='Messages >>', bg="white", fg="blue", font=("Arial Bold", 9))
-message_display_label.grid(column=0,row=1)
+message_display_label = Label(window, text=' Applicaion Messages: ', bg="green", fg="white", font=("Arial Bold", 9))
+message_display_label.grid(column=0,row=1, columnspan=5, padx=10, pady=15, sticky=W)
 	
 # ROW 2:
-	
+# create field for application messages to user
+message_display = Text(window, width=80, height=5)
+message_display.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+message_display.config(state = 'disabled') # field initially disabled
+
+# ROW 3:
+new_entry_label = Label(window, text=' Fields for new entry information: ', \
+bg="green", fg="white", font=("Arial Bold", 9))
+new_entry_label.grid(row=3, column=0, columnspan=5, padx=10, pady=15, sticky=W)
+
+# ROW 4:
+field_last_name = Entry(window, width=20)
+field_last_name.grid(row=4, column=1, columnspan=2, padx=15, pady=15)
+field_last_name_label = Label(window, text='Last Name: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_last_name_label.grid(row=4, column=0, padx=10, sticky=W)
 	
 def display_numeric():
 	
@@ -347,16 +355,16 @@ new_item_3.add_command(label='Delete Record')
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
-# ROW 3:
+# ROW number TBD:
 
 # Temporarily comment out to de-clutter interface building
 """
 # add 'confirm' button related to entry_1
 confirm_button = Button(window, text="Confirm", bg="green", fg="white", command=confirm_entry)
-confirm_button.grid(row=3, column=2, padx=10)
+confirm_button.grid(row=2, column=2, padx=10)
 	
 info_button = Button(window, text="Show basic info", command=show_basic_info)
-info_button.grid(row=3, column=3, padx=5)
+info_button.grid(row=2, column=3, padx=5)
 """
 
 # Functions below are not required every time script is run, and slows it down.
@@ -365,6 +373,10 @@ create_staff_table()
 insert_test_data()
 """
 
+
+# Testing functions
+
+print(current_data.last_name)
 
 # run main loop - last function before closing db
 window.mainloop()
