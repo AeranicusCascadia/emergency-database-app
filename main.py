@@ -299,31 +299,75 @@ def delete_by_id(staff_id):
 	print('delete_by_id')
 		
 
-
-# ROW 7:
-
-# Submit button
-submit_button = Button(window, text='Submit', bg="green", fg="white", font=("Arial Bold", 10))
-submit_button.grid(row=7, column=0, padx=20, pady=15, ipadx=15, sticky=W)
-
 # class to handle application data
 class DataObject:
-	def __init__(self, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 	
+	# constructor
+	def __init__(self, fetch_flag, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
+	
+		self.fetch_flag = fetch_flag
 		self.last_name = last_name
 		self.first_name = first_name
-		self. floor = floor
+		self.floor = floor
 		self.warden_zone = warden_zone
 		self.mob_ass = mob_ass
 		self.med_needs = med_needs
 		
+	def set_last_name(self):
+		self.last_name = field_last_name.get()
+		
+	def set_first_name(self):
+		self.first_name = field_first_name.get()
+		
+	def set_floor(self):
+		self.floor = field_floor.get()
+		
+	def set_warden_zone(self):
+		self.warden_zone = field_warden_zone.get()
+		
+	def set_mobility_assistance(self):
+		self.mob_ass = field_mobility_assistance.get()
+		
+	def set_medical_needs(self):
+		self.med_needs = field_medical_needs.get()
+		
 # Our sole instance of DataObject class
-current_data = DataObject('default last name', 'default first name', 0, 0, 'no', 'no')
+current_data = DataObject(False, 'default last name', 'default first name', 0, 0, 'no', 'no')
 
 def fetch_field_data():
-	pass
+	
+	# check fetch flag enabled
+	if (current_data.fetch_flag == True):
+	
+		print('')
+		print('Fetch from fields enabled.')
+		
+		# fetching methods
+		current_data.set_last_name()
+		current_data.set_first_name()
+		current_data.set_floor()
+		current_data.set_warden_zone()
+		current_data.set_mobility_assistance()
+		current_data.set_medical_needs()
+		
+		# Print to console for testing
+		print('')
+		print(current_data.last_name + ', ' + current_data.first_name)
+		print(F'Floor: {current_data.floor}, Warden Zone: {current_data.warden_zone}')
+		print(F'Mobility Assistance: {current_data.mob_ass}')
+		print(F'Medical Needs: {current_data.med_needs}')
+		
+	
+	else:
+		print('')
+		print('Fetch from fields is still disabled.')
+	
+	
 	
 def menu_create_entry():
+
+	# set fetch flag to True
+	current_data.fetch_flag = True
 
 	print('')
 	print('Create Entry')
@@ -387,6 +431,11 @@ new_item_3.add_command(label='Delete Record')
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
+# ROW 7:
+
+# Submit button
+submit_button = Button(window, text='Submit', bg="green", fg="white", font=("Arial Bold", 10), command=fetch_field_data)
+submit_button.grid(row=7, column=0, padx=20, pady=15, ipadx=15, sticky=W)
 	
 	
 	
