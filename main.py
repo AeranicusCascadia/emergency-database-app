@@ -36,7 +36,7 @@ def client_exit():
 # create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
-window.geometry('800x700')
+window.geometry('800x800')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
@@ -44,30 +44,30 @@ window.config(menu=menu) # attach the menu to root window
 
 # ROW 0:
 
-#main display
+#main display arboxea
 main_display = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 main_display.grid(row=0, column=0, columnspan=10, padx=5, pady=10, sticky=W) # place scroll text box by grid coordinate
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
 
 # ROW 1:
 
-# label for message display
+# label for message display box
 message_display_label = Label(window, text=' Application Messages: ', bg="green", fg="white", font=("Arial Bold", 9))
 message_display_label.grid(row=1, column=0, columnspan=2, padx=10, pady=15, sticky=W)
 	
 # ROW 2:
 
-# message display
+# message display box
 message_display = Text(window, width=80, height=5)
 message_display.grid(row=2, column=0, columnspan=9, padx=10, pady=10, sticky=W)
-
+message_display.config(state = 'disabled')
 
 # ROW 3:
 
 # label for new entry fields
 new_entry_label = Label(window, text=' Fields for new entry information: ', \
 bg="green", fg="white", font=("Arial Bold", 9))
-new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=15, sticky=W)
+new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=20, sticky=W)
 
 # ROW 4:
 
@@ -75,21 +75,60 @@ new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=15, sticky=W)
 field_last_name_label = Label(window, text='Last Name: ', bg="white", fg="blue", font=("Arial Bold", 9))
 field_last_name_label.grid(row=4, column=0, padx=10, sticky=W)
 
-# last name field
-field_last_name = Entry(window, width=35)
-field_last_name.grid(row=4, column=1, sticky=W)
+# last name field entry
+field_last_name = Entry(window, width=32)
+field_last_name.grid(row=4, column=1, pady=15, sticky=W)
+field_last_name.config(state = 'disabled')
 
 # first name field label
 field_first_name_label = Label(window, text='First Name: ', bg="white", fg="blue", font=("Arial Bold", 9))
-field_first_name_label.grid(row=4, column=2)
-
-# first name field
-field_first_name = Entry(window, width=35)
-field_first_name.grid(row=4, column=3)
+field_first_name_label.grid(row=4, column=2, padx=10, sticky=W)
 
 
-	
-	
+# first name field entry
+field_first_name = Entry(window, width=32)
+field_first_name.grid(row=4, column=3, pady=10, sticky=W)
+field_first_name.config(state = 'disabled')
+
+# ROW 5:
+
+# floor field label
+field_floor_label = Label(window, text='Floor: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_floor_label.grid(row=5, column=0, padx=10, sticky=W)
+
+# floor field entry
+field_floor = Entry(window, width=32)
+field_floor.grid(row=5, column=1, pady=10, sticky=W)
+field_floor.config(state = 'disabled')
+
+# warden zone field label
+field_warden_zone_label = Label(window, text='Warden Zone: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_warden_zone_label.grid(row=5, column=2, padx=10, sticky=W)
+
+# warden zone field entry
+field_warden_zone = Entry(window, width=32)
+field_warden_zone.grid(row=5, column=3, pady=10, sticky=W)
+field_warden_zone.config(state = 'disabled')
+
+# ROW 6:
+
+# mobility assistance field label
+mobility_assistance_label = Label(window, text='Mobility Assistance: ', bg="white", fg="blue", font=("Arial Bold", 9))
+mobility_assistance_label.grid(row=6, column=0, padx=10, sticky=W)
+
+# mobility assistance field entry
+field_mobility_assistance = Entry(window, width=32)
+field_mobility_assistance.grid(row=6, column=1, pady=10, sticky=W)
+field_mobility_assistance.config(state = 'disabled')
+
+# medical needs field label
+field_medical_needs_label = Label(window, text='Medical Needs: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_medical_needs_label.grid(row=6, column=2, padx=10, sticky=W)
+
+# medical needs field entry
+field_medical_needs = Entry(window, width=32)
+field_medical_needs.grid(row=6, column=3, pady=10, sticky=W)
+field_medical_needs.config(state = 'disabled')
 	
 def display_numeric():
 	
