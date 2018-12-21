@@ -12,23 +12,6 @@ db = sqlite3.connect('database')
 # Create cursor object
 cursor = db.cursor()
 
-# class to handle application data
-class DataObject:
-	def __init__(self, fetched_data, pre_message, target_var, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
-		self.fetched_data = fetched_data
-		self.pre_message = pre_message
-		self.target_var = target_var
-		self.last_name = last_name
-		self.first_name = first_name
-		self. floor = floor
-		self.warden_zone = warden_zone
-		self.mob_ass = mob_ass
-		self.med_needs = med_needs
-		
-# Our sole instance of DataObject class
-current_data = DataObject('Default fetched data', 'Default pre-message', None, 'default last name'\
-, 'default first name', 0, 0, 'no', 'no')
-
 # File --> Exit
 def client_exit():
 	exit()
@@ -36,7 +19,7 @@ def client_exit():
 # create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
-window.geometry('800x800')
+window.geometry('800x830')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
@@ -44,7 +27,7 @@ window.config(menu=menu) # attach the menu to root window
 
 # ROW 0:
 
-#main display arboxea
+#main display box
 main_display = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
 main_display.grid(row=0, column=0, columnspan=10, padx=5, pady=10, sticky=W) # place scroll text box by grid coordinate
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
@@ -52,7 +35,7 @@ main_display.config(state = 'disabled') # start disabled. enable through appropr
 # ROW 1:
 
 # label for message display box
-message_display_label = Label(window, text=' Application Messages: ', bg="green", fg="white", font=("Arial Bold", 9))
+message_display_label = Label(window, text=' Application Messages: ', bg="blue", fg="white", font=("Arial Bold", 9))
 message_display_label.grid(row=1, column=0, columnspan=2, padx=10, pady=15, sticky=W)
 	
 # ROW 2:
@@ -66,7 +49,7 @@ message_display.config(state = 'disabled')
 
 # label for new entry fields
 new_entry_label = Label(window, text=' Fields for new entry information: ', \
-bg="green", fg="white", font=("Arial Bold", 9))
+bg="blue", fg="white", font=("Arial Bold", 9))
 new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=20, sticky=W)
 
 # ROW 4:
@@ -314,79 +297,69 @@ def delete_by_id(staff_id):
 	
 	# Print to console for testing.
 	print('delete_by_id')
+		
+
+
+# ROW 7:
+
+# Submit button
+submit_button = Button(window, text='Submit', bg="green", fg="white", font=("Arial Bold", 10))
+submit_button.grid(row=7, column=0, padx=20, pady=15, ipadx=15, sticky=W)
+
+# class to handle application data
+class DataObject:
+	def __init__(self, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 	
-def show_basic_info():
-	print('')
-	print('Show Basic Data')
-	
-def confirm_entry():
-	print('')
-	print('Confirm')
+		self.last_name = last_name
+		self.first_name = first_name
+		self. floor = floor
+		self.warden_zone = warden_zone
+		self.mob_ass = mob_ass
+		self.med_needs = med_needs
+		
+# Our sole instance of DataObject class
+current_data = DataObject('default last name', 'default first name', 0, 0, 'no', 'no')
+
+def fetch_field_data():
+	pass
 	
 def menu_create_entry():
+
 	print('')
 	print('Create Entry')
-
-# Rebuild these as object methods
-"""
-def fetch_data_confim():
-
-	global fetched_data
-	global target_var
-	global last_name
 	
-	#fetched_data = entry_1.get()
-	target_var = entry_1.get()
+	# enable text field, clear it, then disable it
+	main_display.config(state = 'normal')
+	main_display.delete(1.0, END)
+	main_display.config(state = 'disabled')
 	
 	message_display.config(state = 'normal')
-	message_display.delete('1.0', END)
-	#message_display.insert('1.0', pre_message + fetched_data)
-	message_display.insert('1.0', pre_message + target_var)
-	entry_1.delete('0', END) # entry widget uses different index reference than text widget!
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
+	field_floor.config(state = 'normal')
+	field_warden_zone.config(state = 'normal')
+	field_mobility_assistance.config(state = 'normal')
+	field_medical_needs.config(state = 'normal')
 	
-	# Default state of message_display should be disabled after function completes.
-	message_display.config(state = 'disabled') # disables application message area to prevent sending unwanted random input
+	message = "Please fill in the fields below, then click the 'Submit' button to create a new entry."
 	
-	# Print to console for testing.
-	print('Calling fetch_data_confim')
+	message_display.delete(1.0, END)
+	message_display.insert(END, message)
+	message_display.config(state = 'disabled')
 	
-	
-def menu_create_entry():
-	
-	# Print to console for testing.
-	print('menu_create_entry')
-	
-	# set target variable to be affected when fetch_data_confim is fired by confirm button.
-	
-	display_numeric()
-	
-	
-	pre_message = "Last name:  "
-	message_display.config(state = 'normal') # enables outputting to Application Message area
-	message_display.insert(0.0, "Creating new a record.\n\nPlease enter the last name of the staff member below and confirm.")
+		
+	"""
+	main_display
+	message_display
+	field_last_name
+	field_first_name
+	field_floor
+	field_warden_zone
+	field_mobility_assistance
+	field_medical_needs
+	"""
 
-	
-	def get_last_name():
-		
-		global target_var
-		global pre_message
-		
-		
-		target_var = last_name
-		pre_message = 'Last name: '
-		
-		
-			
-		message_display.config(state = 'normal')
-		message_display.insert(0.0, "Please enter the last name for new record and confirm.")
-		message_display.config(state = 'disabled')
-
-	get_last_name()
-	
-"""
-	
-	
-	
+# Menu bar	
 	
 # new_item_x represents cascading sub-menu
 new_item_1 = Menu(menu, tearoff=0) # add first menu category
@@ -414,18 +387,20 @@ new_item_3.add_command(label='Delete Record')
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
-# ROW number TBD:
-
-# Temporarily comment out to de-clutter interface building
-"""
-# add 'confirm' button related to entry_1
-confirm_button = Button(window, text="Confirm", bg="green", fg="white", command=confirm_entry)
-confirm_button.grid(row=2, column=2, padx=10)
 	
-info_button = Button(window, text="Show basic info", command=show_basic_info)
-info_button.grid(row=2, column=3, padx=5)
-"""
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 # Functions below are not required every time script is run, and slows it down.
 """	
 create_staff_table()
@@ -433,9 +408,6 @@ insert_test_data()
 """
 
 
-# Testing functions
-
-print(current_data.last_name)
 
 # run main loop - last function before closing db
 window.mainloop()
