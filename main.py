@@ -12,23 +12,6 @@ db = sqlite3.connect('database')
 # Create cursor object
 cursor = db.cursor()
 
-# class to handle application data
-class DataObject:
-	def __init__(self, fetched_data, pre_message, target_var, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
-		self.fetched_data = fetched_data
-		self.pre_message = pre_message
-		self.target_var = target_var
-		self.last_name = last_name
-		self.first_name = first_name
-		self. floor = floor
-		self.warden_zone = warden_zone
-		self.mob_ass = mob_ass
-		self.med_needs = med_needs
-		
-# Our sole instance of DataObject class
-current_data = DataObject('Default fetched data', 'Default pre-message', None, 'default last name'\
-, 'default first name', 0, 0, 'no', 'no')
-
 # File --> Exit
 def client_exit():
 	exit()
@@ -36,7 +19,7 @@ def client_exit():
 # create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
-window.geometry('800x700')
+window.geometry('800x830')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
@@ -44,32 +27,90 @@ window.config(menu=menu) # attach the menu to root window
 
 # ROW 0:
 
-# text area created early so functions defined below can target it
+#main display box
 main_display = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
-main_display.grid(row=0, column=0, columnspan=5, padx=5, pady=10) # place scroll text box by grid coordinate
+main_display.grid(row=0, column=0, columnspan=10, padx=5, pady=10, sticky=W) # place scroll text box by grid coordinate
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
 
 # ROW 1:
-# create and place label for application messages field
-message_display_label = Label(window, text=' Applicaion Messages: ', bg="green", fg="white", font=("Arial Bold", 9))
-message_display_label.grid(column=0,row=1, columnspan=5, padx=10, pady=15, sticky=W)
+
+# label for message display box
+message_display_label = Label(window, text=' Application Messages: ', bg="blue", fg="white", font=("Arial Bold", 9))
+message_display_label.grid(row=1, column=0, columnspan=2, padx=10, pady=15, sticky=W)
 	
 # ROW 2:
-# create field for application messages to user
+
+# message display box
 message_display = Text(window, width=80, height=5)
-message_display.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
-message_display.config(state = 'disabled') # field initially disabled
+message_display.grid(row=2, column=0, columnspan=9, padx=10, pady=10, sticky=W)
+message_display.config(state = 'disabled')
 
 # ROW 3:
-new_entry_label = Label(window, text=' Fields for new entry information: ', \
-bg="green", fg="white", font=("Arial Bold", 9))
-new_entry_label.grid(row=3, column=0, columnspan=5, padx=10, pady=15, sticky=W)
+
+# label for new entry fields
+new_entry_label = Label(window, text=' Fields for entry information: ', bg="blue", fg="white", font=("Arial Bold", 9))
+new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=20, sticky=W)
 
 # ROW 4:
-field_last_name = Entry(window, width=20)
-field_last_name.grid(row=4, column=1, columnspan=2, padx=15, pady=15)
+
+# last name field label
 field_last_name_label = Label(window, text='Last Name: ', bg="white", fg="blue", font=("Arial Bold", 9))
 field_last_name_label.grid(row=4, column=0, padx=10, sticky=W)
+
+# last name field entry
+field_last_name = Entry(window, width=32)
+field_last_name.grid(row=4, column=1, pady=15, sticky=W)
+field_last_name.config(state = 'disabled')
+
+# first name field label
+field_first_name_label = Label(window, text='First Name: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_first_name_label.grid(row=4, column=2, padx=10, sticky=W)
+
+
+# first name field entry
+field_first_name = Entry(window, width=32)
+field_first_name.grid(row=4, column=3, pady=10, sticky=W)
+field_first_name.config(state = 'disabled')
+
+# ROW 5:
+
+# floor field label
+field_floor_label = Label(window, text='Floor: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_floor_label.grid(row=5, column=0, padx=10, sticky=W)
+
+# floor field entry
+field_floor = Entry(window, width=32)
+field_floor.grid(row=5, column=1, pady=10, sticky=W)
+field_floor.config(state = 'disabled')
+
+# warden zone field label
+field_warden_zone_label = Label(window, text='Warden Zone: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_warden_zone_label.grid(row=5, column=2, padx=10, sticky=W)
+
+# warden zone field entry
+field_warden_zone = Entry(window, width=32)
+field_warden_zone.grid(row=5, column=3, pady=10, sticky=W)
+field_warden_zone.config(state = 'disabled')
+
+# ROW 6:
+
+# mobility assistance field label
+mobility_assistance_label = Label(window, text='Mobility Assistance: ', bg="white", fg="blue", font=("Arial Bold", 9))
+mobility_assistance_label.grid(row=6, column=0, padx=10, sticky=W)
+
+# mobility assistance field entry
+field_mobility_assistance = Entry(window, width=32)
+field_mobility_assistance.grid(row=6, column=1, pady=10, sticky=W)
+field_mobility_assistance.config(state = 'disabled')
+
+# medical needs field label
+field_medical_needs_label = Label(window, text='Medical Needs: ', bg="white", fg="blue", font=("Arial Bold", 9))
+field_medical_needs_label.grid(row=6, column=2, padx=10, sticky=W)
+
+# medical needs field entry
+field_medical_needs = Entry(window, width=32)
+field_medical_needs.grid(row=6, column=3, pady=10, sticky=W)
+field_medical_needs.config(state = 'disabled')
 	
 def display_numeric():
 	
@@ -141,10 +182,11 @@ def create_staff_table():
 def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 # insert dest data into staff table
 
+	
 	# insert info into staff table
 	cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
 					VALUES(?,?,?,?,?,?)''',(last_name, first_name, floor, warden_zone, mob_ass, med_needs))
-	
+
 	# commit to database
 	db.commit()
 	
@@ -255,79 +297,146 @@ def delete_by_id(staff_id):
 	
 	# Print to console for testing.
 	print('delete_by_id')
+		
+
+# class to handle application data
+class DataObject:
 	
-def show_basic_info():
-	print('')
-	print('Show Basic Data')
+	# constructor
+	def __init__(self, fetch_flag, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 	
-def confirm_entry():
-	print('')
-	print('Confirm')
+		self.fetch_flag = fetch_flag
+		self.last_name = last_name
+		self.first_name = first_name
+		self.floor = floor
+		self.warden_zone = warden_zone
+		self.mob_ass = mob_ass
+		self.med_needs = med_needs
+		
+	def set_last_name(self):
+		self.last_name = field_last_name.get()
+		
+	def set_first_name(self):
+		self.first_name = field_first_name.get()
+		
+	def set_floor(self):
+		self.floor = field_floor.get()
+		
+	def set_warden_zone(self):
+		self.warden_zone = field_warden_zone.get()
+		
+	def set_mobility_assistance(self):
+		self.mob_ass = field_mobility_assistance.get()
+		
+	def set_medical_needs(self):
+		self.med_needs = field_medical_needs.get()
+		
+	def insert_data(self):
+		# insert info into staff table
+		cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
+					VALUES(?,?,?,?,?,?)''',(self.last_name, self.first_name, self.floor, \
+					self.warden_zone, self.mob_ass, self.med_needs))
+		
+		# commit to database
+		db.commit()
+	
+		
+# Our sole instance of DataObject class
+current_data = DataObject(False, 'default last name', 'default first name', 0, 0, 'no', 'no')
+
+def create_entry_from_fields():
+	
+	# check fetch flag enabled
+	if (current_data.fetch_flag == True):
+	
+		print('')
+		print('Fetch from fields enabled.')
+		
+		# fetching methods
+		current_data.set_last_name()
+		current_data.set_first_name()
+		current_data.set_floor()
+		current_data.set_warden_zone()
+		current_data.set_mobility_assistance()
+		current_data.set_medical_needs()
+		
+		# Print to console for testing
+		print('')
+		print(current_data.last_name + ', ' + current_data.first_name)
+		print(F'Floor: {current_data.floor}, Warden Zone: {current_data.warden_zone}')
+		print(F'Mobility Assistance: {current_data.mob_ass}')
+		print(F'Medical Needs: {current_data.med_needs}')
+		
+		current_data.insert_data()
+	
+		
+		field_last_name.delete(0, END)
+		field_last_name.config(state = 'disabled')
+		
+		field_first_name.delete(0, END)
+		field_first_name.config(state = 'disabled')
+		
+		field_floor.delete(0, END)
+		field_floor.config(state = 'disabled')
+		
+		field_warden_zone.delete(0, END)
+		field_warden_zone.config(state = 'disabled')
+		
+		field_mobility_assistance.delete(0, END)
+		field_mobility_assistance.config(state = 'disabled')
+		
+		field_medical_needs.delete(0, END)
+		field_medical_needs.config(state = 'disabled')
+		
+		
+		
+	else:
+		print('')
+		print('Fetch from fields is still disabled.')
+	
+	
 	
 def menu_create_entry():
+
+	# set fetch flag to True
+	current_data.fetch_flag = True
+
 	print('')
 	print('Create Entry')
-
-# Rebuild these as object methods
-"""
-def fetch_data_confim():
-
-	global fetched_data
-	global target_var
-	global last_name
 	
-	#fetched_data = entry_1.get()
-	target_var = entry_1.get()
+	# enable text field, clear it, then disable it
+	main_display.config(state = 'normal')
+	main_display.delete(1.0, END)
+	main_display.config(state = 'disabled')
 	
 	message_display.config(state = 'normal')
-	message_display.delete('1.0', END)
-	#message_display.insert('1.0', pre_message + fetched_data)
-	message_display.insert('1.0', pre_message + target_var)
-	entry_1.delete('0', END) # entry widget uses different index reference than text widget!
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
+	field_floor.config(state = 'normal')
+	field_warden_zone.config(state = 'normal')
+	field_mobility_assistance.config(state = 'normal')
+	field_medical_needs.config(state = 'normal')
 	
-	# Default state of message_display should be disabled after function completes.
-	message_display.config(state = 'disabled') # disables application message area to prevent sending unwanted random input
+	message = "Please fill in the fields below, then click the 'Submit' button to create a new entry."
 	
-	# Print to console for testing.
-	print('Calling fetch_data_confim')
-	
-	
-def menu_create_entry():
-	
-	# Print to console for testing.
-	print('menu_create_entry')
-	
-	# set target variable to be affected when fetch_data_confim is fired by confirm button.
-	
-	display_numeric()
+	message_display.delete(1.0, END)
+	message_display.insert(END, message)
+	message_display.config(state = 'disabled')
 	
 	
-	pre_message = "Last name:  "
-	message_display.config(state = 'normal') # enables outputting to Application Message area
-	message_display.insert(0.0, "Creating new a record.\n\nPlease enter the last name of the staff member below and confirm.")
+		
+	"""
+	main_display
+	message_display
+	field_last_name
+	field_first_name
+	field_floor
+	field_warden_zone
+	field_mobility_assistance
+	field_medical_needs
+	"""
 
-	
-	def get_last_name():
-		
-		global target_var
-		global pre_message
-		
-		
-		target_var = last_name
-		pre_message = 'Last name: '
-		
-		
-			
-		message_display.config(state = 'normal')
-		message_display.insert(0.0, "Please enter the last name for new record and confirm.")
-		message_display.config(state = 'disabled')
-
-	get_last_name()
-	
-"""
-	
-	
-	
+# Menu bar	
 	
 # new_item_x represents cascading sub-menu
 new_item_1 = Menu(menu, tearoff=0) # add first menu category
@@ -347,7 +456,7 @@ menu.add_cascade(label='Display Records', menu=new_item_2) # add top level (Disp
 
 # and so on...
 new_item_3 = Menu(menu, tearoff=0)
-new_item_3.add_command(label='Create New Record', command=menu_create_entry)
+new_item_3.add_command(label='Create or Modify Record', command=menu_create_entry)
 new_item_3.add_separator()
 new_item_3.add_command(label='Modify Record')
 new_item_3.add_separator()
@@ -355,18 +464,12 @@ new_item_3.add_command(label='Delete Record')
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
-# ROW number TBD:
+# ROW 7:
 
-# Temporarily comment out to de-clutter interface building
-"""
-# add 'confirm' button related to entry_1
-confirm_button = Button(window, text="Confirm", bg="green", fg="white", command=confirm_entry)
-confirm_button.grid(row=2, column=2, padx=10)
+# Submit button
+submit_button = Button(window, text='Create New Entry', bg="green", fg="white", font=("Arial Bold", 10), command=create_entry_from_fields)
+submit_button.grid(row=7, column=0, padx=20, pady=15, ipadx=15, sticky=W)
 	
-info_button = Button(window, text="Show basic info", command=show_basic_info)
-info_button.grid(row=2, column=3, padx=5)
-"""
-
 # Functions below are not required every time script is run, and slows it down.
 """	
 create_staff_table()
@@ -374,9 +477,6 @@ insert_test_data()
 """
 
 
-# Testing functions
-
-print(current_data.last_name)
 
 # run main loop - last function before closing db
 window.mainloop()
