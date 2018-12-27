@@ -342,11 +342,49 @@ class DataObject:
 		db.commit()
 		
 	def delete_data(self):
+	
 		
-		cursor.execute('''DELETE FROM staff WHERE last_name = ?''', (self.last_name,))
+		cursor.execute('''DELETE FROM staff WHERE last_name = ? AND first_name = ?''', (self.last_name, self.first_name))
 		
 		# commit to database
 		db.commit()
+			
+		# Update message to user
+		message = F"Attempting to delete entry for {current_data.last_name}, {current_data.first_name}.\n\
+Updated records are displayed above."
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
+		
+		"""
+		message = F"Unable to delete entry: {self.last_name}, {self.first_name}."
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
+		"""
+		
+	def set_all_data(self):
+	
+		self.set_last_name()
+		self.set_first_name()
+		self.set_floor()
+		self.set_warden_zone()
+		self.set_mobility_assistance()
+		self.set_medical_needs()
+		
+	def reset_data_defaults(self):
+	
+		self.submit_entry_flag = False
+		self.delete_flag = False
+		self.last_name = 'default last name'
+		self.first_name = 'default first name'
+		self.floor = 0
+		self.warden_zone = 0
+		self.mob_ass = 'no'
+		self.med_needs = 'no'
+		
 		
 # Our sole instance of DataObject class
 current_data = DataObject(False, False, 'default last name', 'default first name', 0, 0, 'no', 'no')
@@ -359,6 +397,7 @@ def submit_entry_button_method():
 		print('')
 		print('Fetch from fields enabled.')
 		
+		"""
 		# fetching methods
 		current_data.set_last_name()
 		current_data.set_first_name()
@@ -366,6 +405,10 @@ def submit_entry_button_method():
 		current_data.set_warden_zone()
 		current_data.set_mobility_assistance()
 		current_data.set_medical_needs()
+		"""
+		
+		# call main setter method
+		current_data.set_all_data()
 		
 		# Print to console for testing
 		print('')
@@ -405,6 +448,9 @@ def submit_entry_button_method():
 		# Reset submit entry flag back to false
 		current_data.submit_entry_flag = False
 		
+		# reset data
+		current_data.reset_data_defaults()
+		
 	else:
 		print('')
 		print('Submit Entry flag is still disabled.')
@@ -419,22 +465,38 @@ def submit_entry_button_method():
 	
 def delete_entry_button_method():
 	if (current_data.delete_flag == True):
-	
-		print('Delete entry')
 		
+		# setters
 		current_data.set_last_name()
 		current_data.set_first_name()
 		
+		# call delete method
 		current_data.delete_data()
 		
+		
+		# Refresh display of records
+		display_alphabetic()
+		
+		# reset data
+		current_data.reset_data_defaults()
+		
+		# reset delete flag to false
+		current_data.delete_flag = False
+			
 	else:
 		print('Delete flag still set to False')
 	
-		message = "First, select the 'Delete Record' option from the 'Edit Database' menu in the menu bar."
+		message = "Select the 'Delete Record' option from the 'Edit Database' menu in the\n menu bar."
 		message_display.config(state = 'normal')
 		message_display.delete(1.0, END)
 		message_display.insert(END, message)
 		message_display.config(state = 'disabled')
+	
+	# clear and disable name entry fields
+	field_last_name.delete(0, END)
+	field_first_name.delete(0, END)
+	field_last_name.config(state = 'disabled')
+	field_first_name.config(state = 'disabled')
 	
 # Modify entry
 def menu_delete_entry():
@@ -534,7 +596,11 @@ submit_mod_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
 
 # Delete entry button
 delete_button = Button(window, text='Delete Entry', bg="red", fg="white", font=("Arial Bold", 9), command=delete_entry_button_method)
-delete_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
+delete_button.grid(row=7, column=2, padx=20, pady=15, ipadx=10, sticky=W)
+
+# Delete entry button
+cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9))
+cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
 
 # Functions below are not required every time script is run, and slows it down.
 """	
