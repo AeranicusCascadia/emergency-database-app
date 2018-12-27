@@ -48,8 +48,7 @@ message_display.config(state = 'disabled')
 # ROW 3:
 
 # label for new entry fields
-new_entry_label = Label(window, text=' Fields for new entry information: ', \
-bg="blue", fg="white", font=("Arial Bold", 9))
+new_entry_label = Label(window, text=' Fields for entry information: ', bg="blue", fg="white", font=("Arial Bold", 9))
 new_entry_label.grid(row=3, column=0, padx=10, columnspan=2, pady=20, sticky=W)
 
 # ROW 4:
@@ -183,10 +182,11 @@ def create_staff_table():
 def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 # insert dest data into staff table
 
+	
 	# insert info into staff table
 	cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
 					VALUES(?,?,?,?,?,?)''',(last_name, first_name, floor, warden_zone, mob_ass, med_needs))
-	
+
 	# commit to database
 	db.commit()
 	
@@ -303,10 +303,10 @@ def delete_by_id(staff_id):
 class DataObject:
 	
 	# constructor
-	def __init__(self, fetch_flag, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
+	def __init__(self, submit_entry_flag, delete_flag, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
 	
-		self.fetch_flag = fetch_flag
-		self.last_name = last_name
+		self.submit_entry_flag = submit_entry_flag
+		self.delete_flag = delete_flag
 		self.first_name = first_name
 		self.floor = floor
 		self.warden_zone = warden_zone
@@ -331,13 +331,23 @@ class DataObject:
 	def set_medical_needs(self):
 		self.med_needs = field_medical_needs.get()
 		
-# Our sole instance of DataObject class
-current_data = DataObject(False, 'default last name', 'default first name', 0, 0, 'no', 'no')
-
-def fetch_field_data():
+	def insert_data(self):
+		# insert info into staff table
+		cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
+					VALUES(?,?,?,?,?,?)''',(self.last_name, self.first_name, self.floor, \
+					self.warden_zone, self.mob_ass, self.med_needs))
+		
+		# commit to database
+		db.commit()
 	
-	# check fetch flag enabled
-	if (current_data.fetch_flag == True):
+		
+# Our sole instance of DataObject class
+current_data = DataObject(False, False, 'default last name', 'default first name', 0, 0, 'no', 'no')
+
+def submit_entry_button_method():
+	
+	# check submit entry flag enabled
+	if (current_data.submit_entry_flag == True):
 	
 		print('')
 		print('Fetch from fields enabled.')
@@ -357,22 +367,89 @@ def fetch_field_data():
 		print(F'Mobility Assistance: {current_data.mob_ass}')
 		print(F'Medical Needs: {current_data.med_needs}')
 		
+		# call data insertion method
+		current_data.insert_data()
 	
+		# clear and disable entry fields
+		field_last_name.delete(0, END)
+		field_last_name.config(state = 'disabled')
+		field_first_name.delete(0, END)
+		field_first_name.config(state = 'disabled')
+		field_floor.delete(0, END)
+		field_floor.config(state = 'disabled')
+		field_warden_zone.delete(0, END)
+		field_warden_zone.config(state = 'disabled')
+		field_mobility_assistance.delete(0, END)
+		field_mobility_assistance.config(state = 'disabled')
+		field_medical_needs.delete(0, END)
+		field_medical_needs.config(state = 'disabled')
+		
+		# update message to user
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		
+		message = F'New entry for {current_data.last_name}, {current_data.first_name} created.'
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
+		
+		# Refresh display of records
+		display_alphabetic()
+		
+		# Reset submit entry flag back to false
+		current_data.submit_entry_flag = False
+		
 	else:
 		print('')
-		print('Fetch from fields is still disabled.')
+		print('Submit Entry flag is still disabled.')
+		
+		message = "Please select 'Create New Record' from the 'Edit Database' menu in the menu bar\
+ to begin creating a new staff record entry."
+		
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
 	
+def delete_entry_button_method():
+	if (current_data.delete_flag == True):
+		print('Delete entry')
+		
+	else:
+		print('Delete flag still set to False')
 	
+		message = "First, select the 'Delete Record' option from the 'Edit Database' menu in the menu bar."
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
+	
+# Modify entry
+def menu_delete_entry():
+
+	# Toggle delete flag to set behavior or Delete Entry button method
+	current_data.delete_flag = True
+	
+	# Message to user
+	message = "Please enter the last and first names for the entry you wish to delete in the\nfields below, then\
+ press the 'Delete Entry' button."
+	message_display.config(state = 'normal')
+	message_display.delete(1.0, END)
+	message_display.insert(END, message)
+	message_display.config(state = 'disabled')
+	
+	# enable last and first name fields
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
 	
 def menu_create_entry():
 
 	# set fetch flag to True
-	current_data.fetch_flag = True
+	current_data.submit_entry_flag = True
 
 	print('')
 	print('Create Entry')
 	
-	# enable text field, clear it, then disable it
+	# enable message display field, clear it, then disable it
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
 	main_display.config(state = 'disabled')
@@ -390,6 +467,7 @@ def menu_create_entry():
 	message_display.delete(1.0, END)
 	message_display.insert(END, message)
 	message_display.config(state = 'disabled')
+	
 	
 		
 	"""
@@ -427,29 +505,24 @@ new_item_3.add_command(label='Create New Record', command=menu_create_entry)
 new_item_3.add_separator()
 new_item_3.add_command(label='Modify Record')
 new_item_3.add_separator()
-new_item_3.add_command(label='Delete Record')
+new_item_3.add_command(label='Delete Record', command=menu_delete_entry)
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
 # ROW 7:
 
 # Submit button
-submit_button = Button(window, text='Submit', bg="green", fg="white", font=("Arial Bold", 10), command=fetch_field_data)
-submit_button.grid(row=7, column=0, padx=20, pady=15, ipadx=15, sticky=W)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
+submit_new_button.grid(row=7, column=0, padx=20, pady=15, ipadx=10, sticky=W)
+
+# Submit modification button
+submit_mod_button = Button(window, text='Submit Modification', bg="green", fg="white", font=("Arial Bold", 9))
+submit_mod_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+
+# Delete entry button
+delete_button = Button(window, text='Delete Entry', bg="red", fg="white", font=("Arial Bold", 9), command=delete_entry_button_method)
+delete_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
+
 # Functions below are not required every time script is run, and slows it down.
 """	
 create_staff_table()
