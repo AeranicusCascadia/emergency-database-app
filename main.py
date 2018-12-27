@@ -307,6 +307,7 @@ class DataObject:
 	
 		self.submit_entry_flag = submit_entry_flag
 		self.delete_flag = delete_flag
+		self.last_name = last_name
 		self.first_name = first_name
 		self.floor = floor
 		self.warden_zone = warden_zone
@@ -339,7 +340,13 @@ class DataObject:
 		
 		# commit to database
 		db.commit()
-	
+		
+	def delete_data(self):
+		
+		cursor.execute('''DELETE FROM staff WHERE last_name = ?''', (self.last_name,))
+		
+		# commit to database
+		db.commit()
 		
 # Our sole instance of DataObject class
 current_data = DataObject(False, False, 'default last name', 'default first name', 0, 0, 'no', 'no')
@@ -412,7 +419,13 @@ def submit_entry_button_method():
 	
 def delete_entry_button_method():
 	if (current_data.delete_flag == True):
+	
 		print('Delete entry')
+		
+		current_data.set_last_name()
+		current_data.set_first_name()
+		
+		current_data.delete_data()
 		
 	else:
 		print('Delete flag still set to False')
@@ -493,9 +506,9 @@ menu.add_cascade(label='File', menu=new_item_1) # add top level (File) to first 
 
 # create and configure menu items for Display Records
 new_item_2 = Menu(menu, tearoff=0) # add second menu category
-new_item_2.add_command(label='Display by Entry Number', command=display_numeric)
-new_item_2.add_separator()
 new_item_2.add_command(label='Display by Last Name', command=display_alphabetic)
+new_item_2.add_separator()
+new_item_2.add_command(label='Display by Entry Number', command=display_numeric)
 
 menu.add_cascade(label='Display Records', menu=new_item_2) # add top level (Display Records) to first menu category
 
