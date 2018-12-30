@@ -349,7 +349,7 @@ class DataObject:
 		db.commit()
 			
 		# Update message to user
-		message = F"Attempting to delete entry for {current_data.last_name}, {current_data.first_name}.Updated records are displayed above."
+		message = F"Attempting to delete entry for {current_data.last_name}, {current_data.first_name}. Updated records are displayed above."
 		message_display.config(state = 'normal')
 		message_display.delete(1.0, END)
 		message_display.insert(END, message)
@@ -387,6 +387,24 @@ class DataObject:
 # Our sole instance of DataObject class
 current_data = DataObject(False, False, 'default last name', 'default first name', 0, 0, 'no', 'no')
 
+
+def clear_and_disable_fields():
+	
+	# clear and disable entry fields
+	field_last_name.delete(0, END)
+	field_last_name.config(state = 'disabled')
+	field_first_name.delete(0, END)
+	field_first_name.config(state = 'disabled')
+	field_floor.delete(0, END)
+	field_floor.config(state = 'disabled')
+	field_warden_zone.delete(0, END)
+	field_warden_zone.config(state = 'disabled')
+	field_mobility_assistance.delete(0, END)
+	field_mobility_assistance.config(state = 'disabled')
+	field_medical_needs.delete(0, END)
+	field_medical_needs.config(state = 'disabled')
+
+
 def submit_entry_button_method():
 	
 	# check submit entry flag enabled
@@ -417,7 +435,12 @@ def submit_entry_button_method():
 		
 		# call data insertion method
 		current_data.insert_data()
-	
+		
+		clear_and_disable_fields()
+		
+		# moved all this into a function, which is called above.
+		# remove the following after testing
+		"""
 		# clear and disable entry fields
 		field_last_name.delete(0, END)
 		field_last_name.config(state = 'disabled')
@@ -431,6 +454,7 @@ def submit_entry_button_method():
 		field_mobility_assistance.config(state = 'disabled')
 		field_medical_needs.delete(0, END)
 		field_medical_needs.config(state = 'disabled')
+		"""
 		
 		# update message to user
 		message_display.config(state = 'normal')
@@ -495,7 +519,24 @@ def delete_entry_button_method():
 	field_last_name.config(state = 'disabled')
 	field_first_name.config(state = 'disabled')
 	
-# Modify entry goes here
+# Modify entry function goes here
+
+
+def cancel_action_button_method():
+	
+	# reset data
+	current_data.reset_data_defaults()
+	
+	# clear and disable text entry fields
+	clear_and_disable_fields()
+	
+	# Message to user
+	message = "Current action cancelled."
+	message_display.config(state = 'normal')
+	message_display.delete(1.0, END)
+	message_display.insert(END, message)
+	message_display.config(state = 'disabled')
+
 
 
 def menu_delete_entry():
@@ -522,10 +563,11 @@ def menu_create_entry():
 	print('')
 	print('Create Entry')
 	
-	# enable message display field, clear it, then disable it
+	"""
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
 	main_display.config(state = 'disabled')
+	"""
 	
 	message_display.config(state = 'normal')
 	field_last_name.config(state = 'normal')
@@ -597,7 +639,7 @@ delete_button = Button(window, text='Delete Entry', bg="red", fg="white", font=(
 delete_button.grid(row=7, column=2, padx=20, pady=15, ipadx=10, sticky=W)
 
 # Delete entry button
-cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9))
+cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9), command=cancel_action_button_method)
 cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
 
 # Functions below are not required every time script is run, and slows it down.
