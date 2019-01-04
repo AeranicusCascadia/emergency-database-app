@@ -6,6 +6,87 @@ from tkinter import scrolledtext
 from tkinter import Menu
 from tkinter import messagebox
 
+# class to handle application data
+class DataObject:
+	
+	# constructor
+	def __init__(self, target_button, target_cancel_button, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
+	
+		self.target_button = target_button
+		self.target_cancel_button = target_cancel_button
+		self.last_name = last_name
+		self.first_name = first_name
+		self.floor = floor
+		self.warden_zone = warden_zone
+		self.mob_ass = mob_ass
+		self.med_needs = med_needs
+		
+	def set_last_name(self):
+		self.last_name = field_last_name.get()
+		
+	def set_first_name(self):
+		self.first_name = field_first_name.get()
+		
+	def set_floor(self):
+		self.floor = field_floor.get()
+		
+	def set_warden_zone(self):
+		self.warden_zone = field_warden_zone.get()
+		
+	def set_mobility_assistance(self):
+		self.mob_ass = field_mobility_assistance.get()
+		
+	def set_medical_needs(self):
+		self.med_needs = field_medical_needs.get()
+		
+	def insert_data(self):
+		# insert info into staff table
+		cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
+					VALUES(?,?,?,?,?,?)''',(self.last_name, self.first_name, self.floor, \
+					self.warden_zone, self.mob_ass, self.med_needs))
+		
+		# commit to database
+		db.commit()
+		
+	def delete_data(self):
+	
+		cursor.execute('''DELETE FROM staff WHERE last_name = ? AND first_name = ?''', (self.last_name, self.first_name))
+		
+		# commit to database
+		db.commit()
+			
+		# Update message to user
+		message = F"Attempting to delete entry for {current_data.last_name}, {current_data.first_name}.\n\
+Updated records are displayed above."
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
+		
+	def set_all_data(self):
+	
+		self.set_last_name()
+		self.set_first_name()
+		self.set_floor()
+		self.set_warden_zone()
+		self.set_mobility_assistance()
+		self.set_medical_needs()
+		
+	def reset_data_defaults(self):
+		
+		self.delete_flag = False
+		self.last_name = 'default last name'
+		self.first_name = 'default first name'
+		self.floor = 0
+		self.warden_zone = 0
+		self.mob_ass = 'no'
+		self.med_needs = 'no'
+		
+	
+# instance of DataObject class
+current_data = DataObject('test target button', 'test target cancel button', 'default last name', 'default first name', 0, 0, 'no', 'no')
+
+
 # create database
 db = sqlite3.connect('database')
 
@@ -112,12 +193,56 @@ field_medical_needs = Entry(window, width=32)
 field_medical_needs.grid(row=6, column=3, pady=10, sticky=W)
 field_medical_needs.config(state = 'disabled')
 	
+def clear_and_disable_fields():
 	
+	# clear and disable entry fields
+	field_last_name.delete(0, END)
+	field_last_name.config(state = 'disabled')
+	field_first_name.delete(0, END)
+	field_first_name.config(state = 'disabled')
+	field_floor.delete(0, END)
+	field_floor.config(state = 'disabled')
+	field_warden_zone.delete(0, END)
+	field_warden_zone.config(state = 'disabled')
+	field_mobility_assistance.delete(0, END)
+	field_mobility_assistance.config(state = 'disabled')
+	field_medical_needs.delete(0, END)
+	field_medical_needs.config(state = 'disabled')
 
+def enable_all_input_fields():
+	message_display.config(state = 'normal')
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
+	field_floor.config(state = 'normal')
+	field_warden_zone.config(state = 'normal')
+	field_mobility_assistance.config(state = 'normal')
+	field_medical_needs.config(state = 'normal')
+	
+def clear_message():
+	message_display.config(state = 'normal')
+	message_display.delete(1.0, END)
+	message_display.config(state = 'disabled')
+	
+def display_message(message):
+	
+		message_display.config(state = 'normal')
+		message_display.delete(1.0, END)
+		message_display.insert(END, message)
+		message_display.config(state = 'disabled')
 	
 def display_numeric():
 	
-	# enable text field and clear it
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
+		
+	if (current_data.target_cancel_button != 'test target cancel button'):
+		# remove cancel button
+		current_data.target_cancel_button.grid_remove()
+	
+	clear_and_disable_fields()
+	
+	# enable main display and clear it
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
 	
@@ -143,7 +268,17 @@ def display_numeric():
 	
 def display_alphabetic():
 	
-	# enable text field and clear it
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
+		
+	if (current_data.target_cancel_button != 'test target cancel button'):
+		# remove cancel button
+		current_data.target_cancel_button.grid_remove()
+	
+	clear_and_disable_fields()
+	
+	# enable main display and clear it
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
 
@@ -301,113 +436,14 @@ def delete_by_id(staff_id):
 	# Print to console for testing.
 	print('delete_by_id')
 		
-
-# class to handle application data
-class DataObject:
-	
-	# constructor
-	def __init__(self, submit_entry_flag, delete_flag, target_button, target_cancel_button, last_name, first_name, floor, warden_zone, mob_ass, med_needs):
-	
-		self.submit_entry_flag = submit_entry_flag
-		self.delete_flag = delete_flag
-		self.target_button = target_button
-		self.target_cancel_button = target_cancel_button
-		self.last_name = last_name
-		self.first_name = first_name
-		self.floor = floor
-		self.warden_zone = warden_zone
-		self.mob_ass = mob_ass
-		self.med_needs = med_needs
-		
-	def set_last_name(self):
-		self.last_name = field_last_name.get()
-		
-	def set_first_name(self):
-		self.first_name = field_first_name.get()
-		
-	def set_floor(self):
-		self.floor = field_floor.get()
-		
-	def set_warden_zone(self):
-		self.warden_zone = field_warden_zone.get()
-		
-	def set_mobility_assistance(self):
-		self.mob_ass = field_mobility_assistance.get()
-		
-	def set_medical_needs(self):
-		self.med_needs = field_medical_needs.get()
-		
-	def insert_data(self):
-		# insert info into staff table
-		cursor.execute('''INSERT INTO staff(last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs)
-					VALUES(?,?,?,?,?,?)''',(self.last_name, self.first_name, self.floor, \
-					self.warden_zone, self.mob_ass, self.med_needs))
-		
-		# commit to database
-		db.commit()
-		
-	def delete_data(self):
-	
-		cursor.execute('''DELETE FROM staff WHERE last_name = ? AND first_name = ?''', (self.last_name, self.first_name))
-		
-		# commit to database
-		db.commit()
-			
-		# Update message to user
-		message = F"Attempting to delete entry for {current_data.last_name}, {current_data.first_name}.\n\
-Updated records are displayed above."
-		message_display.config(state = 'normal')
-		message_display.delete(1.0, END)
-		message_display.insert(END, message)
-		message_display.config(state = 'disabled')
-		
-	def set_all_data(self):
-	
-		self.set_last_name()
-		self.set_first_name()
-		self.set_floor()
-		self.set_warden_zone()
-		self.set_mobility_assistance()
-		self.set_medical_needs()
-		
-	def reset_data_defaults(self):
-	
-		self.submit_entry_flag = False
-		self.delete_flag = False
-		self.last_name = 'default last name'
-		self.first_name = 'default first name'
-		self.floor = 0
-		self.warden_zone = 0
-		self.mob_ass = 'no'
-		self.med_needs = 'no'
-		
-	
-# instance of DataObject class
-current_data = DataObject(False, False, 'test target button', 'test target cancel button', 'default last name', 'default first name', 0, 0, 'no', 'no')
-
-def clear_and_disable_fields():
-	
-	# clear and disable entry fields
-	field_last_name.delete(0, END)
-	field_last_name.config(state = 'disabled')
-	field_first_name.delete(0, END)
-	field_first_name.config(state = 'disabled')
-	field_floor.delete(0, END)
-	field_floor.config(state = 'disabled')
-	field_warden_zone.delete(0, END)
-	field_warden_zone.config(state = 'disabled')
-	field_mobility_assistance.delete(0, END)
-	field_mobility_assistance.config(state = 'disabled')
-	field_medical_needs.delete(0, END)
-	field_medical_needs.config(state = 'disabled')
-
-
 	
 def cancel_action_button_method():
 	clear_and_disable_fields()
 	current_data.reset_data_defaults()
 	current_data.target_button.grid_remove()
 	current_data.target_cancel_button.grid_remove()
+	clear_message()
+	display_message('Action Cancelled.')
 	
 def create_cancel_button():	
 	cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9), command=cancel_action_button_method)
@@ -417,122 +453,91 @@ def create_cancel_button():
 		
 def submit_entry_button_method():
 	
-	# check submit entry flag enabled
-	if (current_data.submit_entry_flag == True):
+	print('')
+	print('Fetch from fields enabled.')
+		
+	# call main setter method
+	current_data.set_all_data()
+		
+	# Print to console for testing
+	print('')
+	print(current_data.last_name + ', ' + current_data.first_name)
+	print(F'Floor: {current_data.floor}, Warden Zone: {current_data.warden_zone}')
+	print(F'Mobility Assistance: {current_data.mob_ass}')
+	print(F'Medical Needs: {current_data.med_needs}')
+		
+	# call data insertion method
+	current_data.insert_data()
 	
-		print('')
-		print('Fetch from fields enabled.')
+	clear_and_disable_fields()
 		
-		# call main setter method
-		current_data.set_all_data()
+	clear_message()
 		
-		# Print to console for testing
-		print('')
-		print(current_data.last_name + ', ' + current_data.first_name)
-		print(F'Floor: {current_data.floor}, Warden Zone: {current_data.warden_zone}')
-		print(F'Mobility Assistance: {current_data.mob_ass}')
-		print(F'Medical Needs: {current_data.med_needs}')
+	display_message(F'New entry for {current_data.last_name}, {current_data.first_name} created.')
 		
-		# call data insertion method
-		current_data.insert_data()
-	
-		# clear and disable entry fields
-		field_last_name.delete(0, END)
-		field_last_name.config(state = 'disabled')
-		field_first_name.delete(0, END)
-		field_first_name.config(state = 'disabled')
-		field_floor.delete(0, END)
-		field_floor.config(state = 'disabled')
-		field_warden_zone.delete(0, END)
-		field_warden_zone.config(state = 'disabled')
-		field_mobility_assistance.delete(0, END)
-		field_mobility_assistance.config(state = 'disabled')
-		field_medical_needs.delete(0, END)
-		field_medical_needs.config(state = 'disabled')
+	# Refresh display of records
+	display_alphabetic()
 		
-		# update message to user
-		message_display.config(state = 'normal')
-		message_display.delete(1.0, END)
+	# reset data
+	current_data.reset_data_defaults()
 		
-		message = F'New entry for {current_data.last_name}, {current_data.first_name} created.'
-		message_display.insert(END, message)
-		message_display.config(state = 'disabled')
+	# remove target button
+	current_data.target_button.grid_remove()
 		
-		# Refresh display of records
-		display_alphabetic()
+	# remove cancel button
+	current_data.target_cancel_button.grid_remove()
 		
-		# Reset submit entry flag back to false
-		current_data.submit_entry_flag = False
-		
-		# reset data
-		current_data.reset_data_defaults()
-		
-		# remove target button
-		current_data.target_button.grid_remove()
-		
-		# remove cancel button
-		current_data.target_cancel_button.grid_remove()
-		
-	else:
-		print('')
-		print('Submit Entry flag is still disabled.')
-		
-		message = "Please select 'Create New Record' from the 'Edit Database' menu in the menu bar\
- to begin creating a new staff record entry."
-		
-		message_display.config(state = 'normal')
-		message_display.delete(1.0, END)
-		message_display.insert(END, message)
-		message_display.config(state = 'disabled')
 	
 def delete_entry_button_method():
-	if (current_data.delete_flag == True):
+	
+	# setters
+	current_data.set_last_name()
+	current_data.set_first_name()
 		
-		# setters
-		current_data.set_last_name()
-		current_data.set_first_name()
-		
-		# call delete method
-		current_data.delete_data()
-		
-		
-		# Refresh display of records
-		display_alphabetic()
-		
-		# reset data
-		current_data.reset_data_defaults()
-		
-		# reset delete flag to false
-		current_data.delete_flag = False
+	# call delete method
+	current_data.delete_data()
 			
-	else:
-		print('Delete flag still set to False')
+	# Refresh display of records
+	display_alphabetic()
+		
+	# reset data
+	current_data.reset_data_defaults()
 	
-		message = "Select the 'Delete Record' option from the 'Edit Database' menu in the\n menu bar."
-		message_display.config(state = 'normal')
-		message_display.delete(1.0, END)
-		message_display.insert(END, message)
-		message_display.config(state = 'disabled')
-	
+	# remove target button
+	current_data.target_button.grid_remove()
+		
+	# remove cancel button
+	current_data.target_cancel_button.grid_remove()
+
 	# clear and disable name entry fields
 	field_last_name.delete(0, END)
 	field_first_name.delete(0, END)
 	field_last_name.config(state = 'disabled')
 	field_first_name.config(state = 'disabled')
 	
-# Modify entry
 def menu_delete_entry():
 
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
+
+	# Create button
+	delete_button = Button(window, text='Delete Entry', bg="red", fg="white", font=("Arial Bold", 9), command=delete_entry_button_method)
+	delete_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+	
+	# call method to create cancel action button
+	create_cancel_button()
+	
 	# Toggle delete flag to set behavior or Delete Entry button method
 	current_data.delete_flag = True
 	
-	# Message to user
-	message = "Please enter the last and first names for the entry you wish to delete in the\nfields below, then\
- press the 'Delete Entry' button."
-	message_display.config(state = 'normal')
-	message_display.delete(1.0, END)
-	message_display.insert(END, message)
-	message_display.config(state = 'disabled')
+	# set target button
+	current_data.target_button = delete_button
+	
+	clear_message()
+	
+	display_message("Please enter the last and first names for the entry you wish to delete in the\nfields below, then\
+ press the 'Delete Entry' button.")
 	
 	# enable last and first name fields
 	field_last_name.config(state = 'normal')
@@ -541,27 +546,32 @@ def menu_delete_entry():
 
 def menu_create_entry():
 	
-	submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
-	submit_new_button.grid(row=7, column=0, padx=20, pady=15, ipadx=10, sticky=W)
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
+		
 
 	
-	# set fetch flag to True
-	current_data.submit_entry_flag = True
+	# Create submit button
+	submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
+	submit_new_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+
+	# call method to create cancel action button
+	create_cancel_button()
 	
 	# set target button
 	current_data.target_button = submit_new_button
 	
-	# call method to create cancel action button
-	create_cancel_button()
-	
+	# output to console for testing
 	print('')
 	print('Create Entry')
 	
-	# enable message display field, clear it, then disable it
-	main_display.config(state = 'normal')
-	main_display.delete(1.0, END)
-	main_display.config(state = 'disabled')
+	clear_message()
 	
+	enable_all_input_fields()
+	
+	# refactor into function
+	"""
 	message_display.config(state = 'normal')
 	field_last_name.config(state = 'normal')
 	field_first_name.config(state = 'normal')
@@ -569,13 +579,10 @@ def menu_create_entry():
 	field_warden_zone.config(state = 'normal')
 	field_mobility_assistance.config(state = 'normal')
 	field_medical_needs.config(state = 'normal')
+	"""
 	
-	message = "Please fill in the fields below, then click the 'Submit' button to create a new entry."
+	display_message("Please fill in the fields below, then click the 'Submit' button to create a new entry.")
 	
-	message_display.delete(1.0, END)
-	message_display.insert(END, message)
-	message_display.config(state = 'disabled')
-
 
 # Menu bar	
 	
