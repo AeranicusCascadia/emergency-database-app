@@ -455,7 +455,7 @@ def create_cancel_button():
 	cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9), command=cancel_action_button_method)
 	cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
 	current_data.target_cancel_button = cancel_button
-	
+	current_data.target_button = cancel_button
 		
 def submit_entry_button_method():
 	
@@ -521,6 +521,9 @@ def delete_entry_button_method():
 	field_last_name.config(state = 'disabled')
 	field_first_name.config(state = 'disabled')
 	
+def modify_record_button_method():
+	pass
+	
 def locate_record_button_method():
 
 	# print to console for testing purposes
@@ -543,11 +546,18 @@ def locate_record_button_method():
 		print(row[4])
 		print(row[5])
 		
+		# display messages to user
 		display_message(F'Editing entry for: {current_data.last_name}, {current_data.first_name}.')
+		content = F'{row[0]}, {row[1]}\n\nFloor: {row[2]}\nWarden Zone: {row[3]}\nMobility Assistance: {row[4]}\nMedical Needs: {row[4]}'
+		main_display.config(state = 'normal')
+		main_display.insert(INSERT, content + '\n')
+		
 		
 		"""
-		content = f' {row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
-		main_display.insert(INSERT, content + '\n')
+		# Create modify record button
+		modify_record_button = Button(window, text='Submit Changes', bg="green", fg="white", font=("Arial Bold", 9))
+		modify_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+		current.data.target_button = modify_record_button
 		"""
 		
 	except:
@@ -560,10 +570,12 @@ def locate_record_button_method():
 		current_data.target_button.grid_remove()
 		current_data.target_cancel_button.grid_remove()
 	
+	current_data.target_button.grid_remove()
+	
 	clear_and_disable_fields()
 	
-def modify_record_button_method():
-	pass
+
+
 	
 def menu_delete_entry():
 
@@ -594,6 +606,7 @@ def menu_delete_entry():
 	field_first_name.config(state = 'normal')
 	
 def menu_modify_record():
+	
 
 	# print to console for testing purposes
 	print('Modify Entry')
