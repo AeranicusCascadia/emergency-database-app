@@ -1,4 +1,5 @@
 # GUI build of staff emergency database application
+# 01-16-2018
 
 import sqlite3
 from tkinter import *
@@ -318,7 +319,7 @@ def create_staff_table():
 		print('create_staff_table --> attempted to create staff table, but it already exists.')	
 
 def insert_data(last_name, first_name, floor, warden_zone, mob_ass, med_needs):
-# insert dest data into staff table
+# insert data into staff table
 
 	
 	# insert info into staff table
@@ -343,6 +344,8 @@ def insert_test_data():
 	
 	# Print to console for testing.
 	print('insert_test_data')
+	
+	display_alphabetic()
 	
 def update_floor(l_name, f_name, new_data):
 	
@@ -445,6 +448,9 @@ def cancel_action_button_method():
 	clear_message()
 	display_message('Action Cancelled.')
 	
+	# print to console for testing purposes
+	print('Action Cancelled.')
+	
 def create_cancel_button():	
 	cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9), command=cancel_action_button_method)
 	cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
@@ -515,6 +521,50 @@ def delete_entry_button_method():
 	field_last_name.config(state = 'disabled')
 	field_first_name.config(state = 'disabled')
 	
+def locate_record_button_method():
+
+	# print to console for testing purposes
+	print('Locate Entry')
+	
+	# setters
+	current_data.set_last_name()
+	current_data.set_first_name()
+	
+	try:
+		cursor.execute('''SELECT last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff WHERE last_name = ? AND first_name = ?''', (current_data.last_name, current_data.first_name))
+		row = cursor.fetchone()
+		
+		# print to console for testing
+		print('')
+		print(row[0])
+		print(row[1])
+		print(row[2])
+		print(row[3])
+		print(row[4])
+		print(row[5])
+		
+		display_message(F'Editing entry for: {current_data.last_name}, {current_data.first_name}.')
+		
+		"""
+		content = f' {row[0]})  {row[1]}, {row[2]} | Floor: {row[3]} | Warden Zone: {row[4]} | Assistance: {row[5]} | Med: {row[6]}'
+		main_display.insert(INSERT, content + '\n')
+		"""
+		
+	except:
+		print('Cannot locate that entry.')
+		
+		display_message(F'Cannot locate record for: {current_data.last_name}, {current_data.first_name}.')
+		
+		clear_and_disable_fields()
+		current_data.reset_data_defaults()
+		current_data.target_button.grid_remove()
+		current_data.target_cancel_button.grid_remove()
+	
+	clear_and_disable_fields()
+	
+def modify_record_button_method():
+	pass
+	
 def menu_delete_entry():
 
 	if (current_data.target_button != 'test target button'):
@@ -543,14 +593,38 @@ def menu_delete_entry():
 	field_last_name.config(state = 'normal')
 	field_first_name.config(state = 'normal')
 	
+def menu_modify_record():
 
+	# print to console for testing purposes
+	print('Modify Entry')
+	
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
+
+	# Create modify button
+	locate_record_button = Button(window, text='Locate Record', bg="orange", fg="black", font=("Arial Bold", 9), command=locate_record_button_method)
+	locate_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+
+	# call method to create cancel action button
+	create_cancel_button()
+	
+	# set target button
+	current_data.target_button = locate_record_button	
+	
+	clear_message()
+	
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
+	
+	display_message("Please enter the first and last name of the record you wish to modify,\nthen press the 'Locate Record; button.")
+		
+		
 def menu_create_entry():
 	
 	if (current_data.target_button != 'test target button'):
 		# remove target button
 		current_data.target_button.grid_remove()
-		
-
 	
 	# Create submit button
 	submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
@@ -569,17 +643,6 @@ def menu_create_entry():
 	clear_message()
 	
 	enable_all_input_fields()
-	
-	# refactor into function
-	"""
-	message_display.config(state = 'normal')
-	field_last_name.config(state = 'normal')
-	field_first_name.config(state = 'normal')
-	field_floor.config(state = 'normal')
-	field_warden_zone.config(state = 'normal')
-	field_mobility_assistance.config(state = 'normal')
-	field_medical_needs.config(state = 'normal')
-	"""
 	
 	display_message("Please fill in the fields below, then click the 'Submit' button to create a new entry.")
 	
@@ -602,61 +665,28 @@ new_item_2.add_command(label='Display by Entry Number', command=display_numeric)
 
 menu.add_cascade(label='Display Records', menu=new_item_2) # add top level (Display Records) to first menu category
 
-# and so on...
 new_item_3 = Menu(menu, tearoff=0)
 new_item_3.add_command(label='Create New Record', command=menu_create_entry)
+
 new_item_3.add_separator()
-new_item_3.add_command(label='Modify Record')
+new_item_3.add_command(label='Modify Record', command=menu_modify_record)
+
 new_item_3.add_separator()
 new_item_3.add_command(label='Delete Record', command=menu_delete_entry)
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
 
-
-
-
-# ROW 7:
-
-# Refactoring to create button widgets as functions, so that they are hideable
-"""
-# Submit button
-submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
-submit_new_button.grid(row=7, column=0, padx=20, pady=15, ipadx=10, sticky=W)
-
-# Submit modification button
-submit_mod_button = Button(window, text='Submit Modification', bg="green", fg="white", font=("Arial Bold", 9))
-submit_mod_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
-
-# Delete entry button
-delete_button = Button(window, text='Delete Entry', bg="red", fg="white", font=("Arial Bold", 9), command=delete_entry_button_method)
-delete_button.grid(row=7, column=2, padx=20, pady=15, ipadx=10, sticky=W)
-
-# cancel action button
-cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9))
-cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
-"""
-
-
-# Functions below are not required every time script is run, and slows it down.
-"""	
-create_staff_table()
-insert_test_data()
-"""
+new_item_4 = Menu(menu, tearoff=0)
+new_item_4.add_command(label='Insert example records', command=insert_test_data) 
+menu.add_cascade(label='Testing Actions', menu=new_item_4) 
 
 
 
 
+create_staff_table() # creates table or handles exception if it already exists
 
-
-
-
-
-
-
-
-
-
-
+# initial display of records when at application startup
+# display_alphabetic() 
 
 
 # run main loop - last function before closing db
