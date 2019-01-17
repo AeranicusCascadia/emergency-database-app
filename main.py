@@ -1,5 +1,5 @@
 # GUI build of staff emergency database application
-# 01-16-2018
+# 01-17-2018
 
 import sqlite3
 from tkinter import *
@@ -456,6 +456,14 @@ def create_cancel_button():
 	cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
 	current_data.target_cancel_button = cancel_button
 	current_data.target_button = cancel_button
+	
+def create_modify_button():
+	
+	modify_record_button = Button(window, text='Modify Record', bg="green", fg="white", font=("Arial Bold", 9), command=modify_record_button_method)
+	modify_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+	current_data.target_button = modify_record_button
+	
+	print('Create modify button')
 		
 def submit_entry_button_method():
 	
@@ -494,6 +502,24 @@ def submit_entry_button_method():
 	current_data.target_cancel_button.grid_remove()
 		
 	
+def fetch_and_display_one_record():
+	
+	cursor.execute('''SELECT last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff WHERE last_name = ? AND first_name = ?''', (current_data.last_name, current_data.first_name))
+	row = cursor.fetchone()
+		
+	# set properties for current data based on query
+	current_data.last_name = row[0]
+	current_data.first_name = row[1]
+	current_data.floor = row[2]
+	current_data.warden_zone = row[3]
+	current_data.mob_ass = row[4]
+	current_data.med_needs = row[5]
+
+	display_message(F'Editing entry for: {current_data.last_name}, {current_data.first_name}.')
+	content = F'{row[0]}, {row[1]}\n\nFloor: {row[2]}\nWarden Zone: {row[3]}\nMobility Assistance: {row[4]}\nMedical Needs: {row[4]}'
+	main_display.config(state = 'normal')
+	main_display.insert(INSERT, content + '\n')
+	
 def delete_entry_button_method():
 	
 	# setters
@@ -522,7 +548,30 @@ def delete_entry_button_method():
 	field_first_name.config(state = 'disabled')
 	
 def modify_record_button_method():
-	pass
+	print('Calling Modify Record Button Method.')
+	
+def populate_fields():
+
+	# last and first name fields should already be completed by user for search
+
+	# enable remaining fields
+	field_floor.config(state = 'normal')
+	field_warden_zone.config(state = 'normal')
+	field_mobility_assistance.config(state = 'normal')
+	field_medical_needs.config(state = 'normal')
+	
+	current_floor = current_data.floor
+	current_warden_zone = current_data.warden_zone
+	current_mob_ass = current_data.mob_ass
+	current_med_needs = current_data.med_needs
+	
+	field_floor.insert(END, current_floor)
+	field_warden_zone.insert(END, current_warden_zone)
+	field_mobility_assistance.insert(END, current_mob_ass)
+	field_medical_needs.insert(END, current_med_needs)
+	
+	
+	
 	
 def locate_record_button_method():
 
@@ -534,31 +583,16 @@ def locate_record_button_method():
 	current_data.set_first_name()
 	
 	try:
-		cursor.execute('''SELECT last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff WHERE last_name = ? AND first_name = ?''', (current_data.last_name, current_data.first_name))
-		row = cursor.fetchone()
 		
-		# print to console for testing
-		print('')
-		print(row[0])
-		print(row[1])
-		print(row[2])
-		print(row[3])
-		print(row[4])
-		print(row[5])
+		# Display one record
+		fetch_and_display_one_record()
 		
-		# display messages to user
-		display_message(F'Editing entry for: {current_data.last_name}, {current_data.first_name}.')
-		content = F'{row[0]}, {row[1]}\n\nFloor: {row[2]}\nWarden Zone: {row[3]}\nMobility Assistance: {row[4]}\nMedical Needs: {row[4]}'
-		main_display.config(state = 'normal')
-		main_display.insert(INSERT, content + '\n')
+		# button manipulation
+		current_data.target_button.grid_remove()
+		create_modify_button()
 		
+		populate_fields()
 		
-		"""
-		# Create modify record button
-		modify_record_button = Button(window, text='Submit Changes', bg="green", fg="white", font=("Arial Bold", 9))
-		modify_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
-		current.data.target_button = modify_record_button
-		"""
 		
 	except:
 		print('Cannot locate that entry.')
@@ -569,10 +603,10 @@ def locate_record_button_method():
 		current_data.reset_data_defaults()
 		current_data.target_button.grid_remove()
 		current_data.target_cancel_button.grid_remove()
+		current_data.target_button.grid_remove()
 	
-	current_data.target_button.grid_remove()
 	
-	clear_and_disable_fields()
+	#clear_and_disable_fields()
 	
 
 
