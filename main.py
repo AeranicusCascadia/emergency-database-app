@@ -110,7 +110,7 @@ window.config(menu=menu) # attach the menu to root window
 # ROW 0:
 
 #main display box
-main_display = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
+main_display = scrolledtext.ScrolledText(window,width=95,height=12) # create scroll text box
 main_display.grid(row=0, column=0, columnspan=10, padx=5, pady=10, sticky=W) # place scroll text box by grid coordinate
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
 
@@ -224,6 +224,10 @@ def clear_message():
 	message_display.delete(1.0, END)
 	message_display.config(state = 'disabled')
 	
+def clear_display():
+	main_display.config(state = 'normal')
+	main_display.delete(1.0, END)
+	
 def display_message(message):
 	
 		message_display.config(state = 'normal')
@@ -242,10 +246,8 @@ def display_numeric():
 		current_data.target_cancel_button.grid_remove()
 	
 	clear_and_disable_fields()
-	
-	# enable main display and clear it
-	main_display.config(state = 'normal')
-	main_display.delete(1.0, END)
+	clear_message()
+	clear_display()
 	
 	#execute select query, default sort by primary key
 	cursor.execute('''SELECT staff_id, last_name, first_name, \
@@ -278,10 +280,14 @@ def display_alphabetic():
 		current_data.target_cancel_button.grid_remove()
 	
 	clear_and_disable_fields()
+	clear_message()
+	clear_display()
 	
+	"""
 	# enable main display and clear it
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
+	"""
 
 	#execute select query, default sort by primary key
 	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, \
@@ -548,7 +554,16 @@ def delete_entry_button_method():
 	field_first_name.config(state = 'disabled')
 	
 def modify_record_button_method():
+	
 	print('Calling Modify Record Button Method.')
+	
+	current_data.set_all_data()
+	
+	
+	update_floor(current_data.last_name, current_data.first_name, current_data.floor)
+	update_warden_zone(current_data.last_name, current_data.first_name, current_data.warden_zone)
+	update_mobility_assistance(current_data.last_name, current_data.first_name, current_data.mob_ass)
+	update_medical_needs(current_data.last_name, current_data.first_name, current_data.med_needs)
 	
 def populate_fields():
 
@@ -575,6 +590,8 @@ def populate_fields():
 	
 def locate_record_button_method():
 
+	clear_display()
+	
 	# print to console for testing purposes
 	print('Locate Entry')
 	
