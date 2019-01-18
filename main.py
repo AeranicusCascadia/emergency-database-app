@@ -1,4 +1,5 @@
 # GUI build of staff emergency database application
+# 01-17-2018
 
 import sqlite3
 from tkinter import *
@@ -100,7 +101,7 @@ def client_exit():
 # create and define root window
 window = Tk()
 window.title("Database Manager: CPM staff emergency information")
-window.geometry('800x830')
+window.geometry('800x700')
 
 menu = Menu(window) # add menu (automatically goes on top bar in root window
 
@@ -109,7 +110,7 @@ window.config(menu=menu) # attach the menu to root window
 # ROW 0:
 
 #main display box
-main_display = scrolledtext.ScrolledText(window,width=95,height=25) # create scroll text box
+main_display = scrolledtext.ScrolledText(window,width=95,height=12) # create scroll text box
 main_display.grid(row=0, column=0, columnspan=10, padx=5, pady=10, sticky=W) # place scroll text box by grid coordinate
 main_display.config(state = 'disabled') # start disabled. enable through appropriate functions
 
@@ -223,6 +224,10 @@ def clear_message():
 	message_display.delete(1.0, END)
 	message_display.config(state = 'disabled')
 	
+def clear_display():
+	main_display.config(state = 'normal')
+	main_display.delete(1.0, END)
+	
 def display_message(message):
 	
 		message_display.config(state = 'normal')
@@ -241,10 +246,8 @@ def display_numeric():
 		current_data.target_cancel_button.grid_remove()
 	
 	clear_and_disable_fields()
-	
-	# enable main display and clear it
-	main_display.config(state = 'normal')
-	main_display.delete(1.0, END)
+	clear_message()
+	clear_display()
 	
 	#execute select query, default sort by primary key
 	cursor.execute('''SELECT staff_id, last_name, first_name, \
@@ -277,10 +280,14 @@ def display_alphabetic():
 		current_data.target_cancel_button.grid_remove()
 	
 	clear_and_disable_fields()
+	clear_message()
+	clear_display()
 	
+	"""
 	# enable main display and clear it
 	main_display.config(state = 'normal')
 	main_display.delete(1.0, END)
+	"""
 
 	#execute select query, default sort by primary key
 	cursor.execute('''SELECT staff_id, last_name, first_name, floor, warden_zone, \
@@ -365,7 +372,7 @@ def update_floor(l_name, f_name, new_data):
 def update_warden_zone(l_name, f_name, new_data):
 	
 	# Execute SQL
-	cursor.execute('''UPDATE staff SET mobility_assistance = ? WHERE last_name = ? AND first_name = ?'''\
+	cursor.execute('''UPDATE staff SET warden_zone = ? WHERE last_name = ? AND first_name = ?'''\
 	,(new_data, l_name, f_name,))
 	
 	# Commit changes to database
@@ -381,7 +388,7 @@ def update_warden_zone(l_name, f_name, new_data):
 def update_mobility_assistance(l_name, f_name, new_data):
 
 		# Execute SQL
-		cursor.execute('''UPDATE staff SET medical_needs = ? WHERE last_name = ? AND first_name = ?'''\
+		cursor.execute('''UPDATE staff SET mobility_assistance = ? WHERE last_name = ? AND first_name = ?'''\
 		,(new_data, l_name, f_name,))
 		
 		# Commit changes to database
@@ -444,14 +451,26 @@ def cancel_action_button_method():
 	current_data.reset_data_defaults()
 	current_data.target_button.grid_remove()
 	current_data.target_cancel_button.grid_remove()
+	clear_display()
 	clear_message()
 	display_message('Action Cancelled.')
+	
+	# print to console for testing purposes
+	print('Action Cancelled.')
 	
 def create_cancel_button():	
 	cancel_button = Button(window, text='Cancel Action', bg="yellow", fg="red", font=("Arial Bold", 9), command=cancel_action_button_method)
 	cancel_button.grid(row=7, column=3, padx=20, pady=15, ipadx=10, sticky=W)
 	current_data.target_cancel_button = cancel_button
+	current_data.target_button = cancel_button
 	
+def create_modify_button():
+	
+	modify_record_button = Button(window, text='Modify Record', bg="green", fg="white", font=("Arial Bold", 9), command=modify_record_button_method)
+	modify_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+	current_data.target_button = modify_record_button
+	
+	print('Create modify button')
 		
 def submit_entry_button_method():
 	
@@ -473,10 +492,6 @@ def submit_entry_button_method():
 	
 	clear_and_disable_fields()
 		
-	clear_message()
-		
-	display_message(F'New entry for {current_data.last_name}, {current_data.first_name} created.')
-		
 	# Refresh display of records
 	display_alphabetic()
 		
@@ -489,6 +504,41 @@ def submit_entry_button_method():
 	# remove cancel button
 	current_data.target_cancel_button.grid_remove()
 		
+	
+def fetch_and_display_one_record():
+	
+	cursor.execute('''SELECT last_name, first_name, floor, warden_zone, mobility_assistance, medical_needs FROM staff WHERE last_name = ? AND first_name = ?''', (current_data.last_name, current_data.first_name))
+	row = cursor.fetchone()
+		
+	# set properties for current data based on query
+	current_data.last_name = row[0]
+	current_data.first_name = row[1]
+	current_data.floor = row[2]
+	current_data.warden_zone = row[3]
+	current_data.mob_ass = row[4]
+	current_data.med_needs = row[5]
+
+	"""
+	display_message(F'Editing entry for: {current_data.last_name}, {current_data.first_name}.')
+	content = F'{row[0]}, {row[1]}\n\nFloor: {row[2]}\nWarden Zone: {row[3]}\nMobility Assistance: {row[4]}\nMedical Needs: {row[4]}'
+	main_display.config(state = 'normal')
+	main_display.insert(INSERT, content + '\n')
+	"""
+	
+def display_current_record():
+
+	clear_display()
+
+	col_0 = current_data.last_name
+	col_1 = current_data.first_name
+	col_2 = current_data.floor
+	col_3 = current_data.warden_zone
+	col_4 = current_data.mob_ass
+	col_5 = current_data.med_needs
+		
+	content = F'{col_0}, {col_1}\n\nFloor: {col_2}\nWarden Zone: {col_3}\nMobility Assistance: {col_4}\nMedical Needs: {col_5}'
+	main_display.config(state = 'normal')
+	main_display.insert(INSERT, content + '\n')
 	
 def delete_entry_button_method():
 	
@@ -517,7 +567,116 @@ def delete_entry_button_method():
 	field_last_name.config(state = 'disabled')
 	field_first_name.config(state = 'disabled')
 	
+def modify_record_button_method():
+	
+	print('Calling Modify Record Button Method.')
+	
+	current_data.set_all_data()
+	
+	update_floor(current_data.last_name, current_data.first_name, current_data.floor)
+	update_warden_zone(current_data.last_name, current_data.first_name, current_data.warden_zone)
+	update_mobility_assistance(current_data.last_name, current_data.first_name, current_data.mob_ass)
+	update_medical_needs(current_data.last_name, current_data.first_name, current_data.med_needs)
+	
+	clear_display()
+	display_current_record()
+	
+	clear_message()
+	display_message(F'Changes to {current_data.last_name}, {current_data.first_name} updated.')
+	
+	clear_and_disable_fields()
+	
+	# reset data
+	current_data.reset_data_defaults()
+		
+	# remove target button
+	current_data.target_button.grid_remove()
+		
+	# remove cancel button
+	current_data.target_cancel_button.grid_remove()
+	
+def populate_fields():
+
+	# last and first name fields should already be completed by user for search
+
+	# enable remaining fields
+	field_floor.config(state = 'normal')
+	field_warden_zone.config(state = 'normal')
+	field_mobility_assistance.config(state = 'normal')
+	field_medical_needs.config(state = 'normal')
+	
+	current_floor = current_data.floor
+	current_warden_zone = current_data.warden_zone
+	current_mob_ass = current_data.mob_ass
+	current_med_needs = current_data.med_needs
+	
+	field_floor.insert(END, current_floor)
+	field_warden_zone.insert(END, current_warden_zone)
+	field_mobility_assistance.insert(END, current_mob_ass)
+	field_medical_needs.insert(END, current_med_needs)
+	
+	
+def locate_record_button_method():
+
+	clear_display()
+	
+	# print to console for testing purposes
+	print('Locate Entry')
+	
+	# setters
+	current_data.set_last_name()
+	current_data.set_first_name()
+	
+	try:
+		
+		# Display one record
+		fetch_and_display_one_record()
+		
+		# button manipulation
+		current_data.target_button.grid_remove()
+		create_modify_button()
+		
+		# Populate editable record fields
+		populate_fields()
+		
+		# Display messages to user
+		display_message(F"Editing entry for: {current_data.last_name}, {current_data.first_name}.\nPlease make the desired changes then click the 'Modify Record' button.")
+		display_current_record()
+		
+		
+		"""
+		col_0 = current_data.last_name
+		col_1 = current_data.first_name
+		col_2 = current_data.floor
+		col_3 = current_data.warden_zone
+		col_4 = current_data.mob_ass
+		col_5 = current_data.med_needs
+		
+		content = F'{col_0}, {col_1}\n\nFloor: {col_2}\nWarden Zone: {col_3}\nMobility Assistance: {col_4}\nMedical Needs: {col_5}'
+		main_display.config(state = 'normal')
+		main_display.insert(INSERT, content + '\n')
+		"""
+		
+	except:
+		print('Cannot locate that entry.')
+		
+		display_message(F'Cannot locate record for: {current_data.last_name}, {current_data.first_name}.')
+		
+		clear_and_disable_fields()
+		current_data.reset_data_defaults()
+		current_data.target_button.grid_remove()
+		current_data.target_cancel_button.grid_remove()
+		current_data.target_button.grid_remove()
+	
+	
+	#clear_and_disable_fields()
+	
+
+
+	
 def menu_delete_entry():
+
+	display_alphabetic()
 
 	if (current_data.target_button != 'test target button'):
 		# remove target button
@@ -545,14 +704,38 @@ def menu_delete_entry():
 	field_last_name.config(state = 'normal')
 	field_first_name.config(state = 'normal')
 	
+def menu_modify_record():
+	
+	# print to console for testing purposes
+	print('Modify Entry')
+	
+	if (current_data.target_button != 'test target button'):
+		# remove target button
+		current_data.target_button.grid_remove()
 
+	# Create modify button
+	locate_record_button = Button(window, text='Locate Record', bg="orange", fg="black", font=("Arial Bold", 9), command=locate_record_button_method)
+	locate_record_button.grid(row=7, column=1, padx=20, pady=15, ipadx=10, sticky=W)
+
+	# call method to create cancel action button
+	create_cancel_button()
+	
+	# set target button
+	current_data.target_button = locate_record_button	
+	
+	clear_message()
+	
+	field_last_name.config(state = 'normal')
+	field_first_name.config(state = 'normal')
+	
+	display_message("Please enter the first and last name of the record you wish to modify,\nthen press the 'Locate Record; button.")
+		
+		
 def menu_create_entry():
 	
 	if (current_data.target_button != 'test target button'):
 		# remove target button
 		current_data.target_button.grid_remove()
-		
-
 	
 	# Create submit button
 	submit_new_button = Button(window, text='Submit New Entry', bg="green", fg="white", font=("Arial Bold", 9), command=submit_entry_button_method)
@@ -571,17 +754,6 @@ def menu_create_entry():
 	clear_message()
 	
 	enable_all_input_fields()
-	
-	# refactor into function
-	"""
-	message_display.config(state = 'normal')
-	field_last_name.config(state = 'normal')
-	field_first_name.config(state = 'normal')
-	field_floor.config(state = 'normal')
-	field_warden_zone.config(state = 'normal')
-	field_mobility_assistance.config(state = 'normal')
-	field_medical_needs.config(state = 'normal')
-	"""
 	
 	display_message("Please fill in the fields below, then click the 'Submit' button to create a new entry.")
 	
@@ -608,6 +780,9 @@ new_item_3 = Menu(menu, tearoff=0)
 new_item_3.add_command(label='Create New Record', command=menu_create_entry)
 
 new_item_3.add_separator()
+new_item_3.add_command(label='Modify Record', command=menu_modify_record)
+
+new_item_3.add_separator()
 new_item_3.add_command(label='Delete Record', command=menu_delete_entry)
 
 menu.add_cascade(label='Edit Database', menu=new_item_3)
@@ -621,7 +796,8 @@ menu.add_cascade(label='Testing Actions', menu=new_item_4)
 
 create_staff_table() # creates table or handles exception if it already exists
 
-display_alphabetic() # initial display of records when at application startup
+# initial display of records when at application startup
+display_alphabetic() 
 
 
 # run main loop - last function before closing db
