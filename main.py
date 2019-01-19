@@ -448,12 +448,16 @@ def delete_by_id(staff_id):
 	
 def cancel_action_button_method():
 	clear_and_disable_fields()
+	
 	current_data.reset_data_defaults()
 	current_data.target_button.grid_remove()
 	current_data.target_cancel_button.grid_remove()
+	
 	clear_display()
 	clear_message()
 	display_message('Action Cancelled.')
+	
+	display_alphabetic()
 	
 	# print to console for testing purposes
 	print('Action Cancelled.')
@@ -663,15 +667,12 @@ def locate_record_button_method():
 		display_message(F'Cannot locate record for: {current_data.last_name}, {current_data.first_name}.')
 		
 		clear_and_disable_fields()
+		display_alphabetic()
+		
 		current_data.reset_data_defaults()
 		current_data.target_button.grid_remove()
 		current_data.target_cancel_button.grid_remove()
-		current_data.target_button.grid_remove()
-	
-	
-	#clear_and_disable_fields()
-	
-
+		current_data.target_button.grid_remove()	
 
 	
 def menu_delete_entry():
